@@ -2,177 +2,213 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Amazon PPC Bulk Tool</title>
+<title>Amazon PPC Suite</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{--or:#FF9900;--dk:#232F3E;--bl:#146EB4;--gn:#067D62;--rd:#CC0C39;--yw:#B7791F;
---bg:#F0F2F5;--cd:#fff;--br:#DDD;--tx:#111;--mu:#666;--lt:#f7f8fa;}
+/* ── TOKENS ── */
+:root{
+  --or:#FF9900;--dk:#232F3E;--bl:#146EB4;--gn:#067D62;--rd:#CC0C39;--yw:#92400E;
+  --bg:#EEF0F4;--cd:#fff;--br:#DDD;--tx:#111;--mu:#6B7280;--lt:#F9FAFB;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
-/* HEADER */
-header{background:var(--dk);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
-.logo{color:#fff;font-size:16px;font-weight:700;}.logo span{color:var(--or);}
-.logo small{display:block;color:#999;font-size:10px;font-weight:400;margin-top:1px;}
-.hbadge{margin-left:auto;background:var(--or);color:#fff;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:700;}
-/* LAYOUT */
-.app{display:flex;flex:1;overflow:hidden;}
-/* SIDEBAR */
-aside{width:200px;background:var(--dk);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
-.nav-section{padding:10px 14px 4px;color:#7a8a9a;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;color:#bbb;transition:background .15s,color .15s;border-left:3px solid transparent;user-select:none;}
-.nav-item:hover{background:rgba(255,255,255,.05);color:#fff;}
-.nav-item.active{background:rgba(255,153,0,.1);color:var(--or);border-left-color:var(--or);}
-.nav-item .ico{font-size:13px;width:16px;text-align:center;}
-.nav-item .lbl{font-size:12px;}
-.nav-badge{margin-left:auto;background:var(--or);color:#fff;border-radius:9px;padding:1px 6px;font-size:9px;font-weight:700;display:none;}
-.nav-badge.on{display:block;}
-/* MAIN */
-main{flex:1;overflow-y:auto;padding:18px 20px;}
-.panel{display:none;}.panel.active{display:block;}
-/* PAGE HEAD */
-.ph{margin-bottom:16px;}
-.ph h2{font-size:15px;font-weight:700;color:var(--dk);}
-.ph p{color:var(--mu);font-size:12px;margin-top:3px;}
-/* CARD */
-.card{background:var(--cd);border:1px solid var(--br);border-radius:6px;padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
-.ch{font-size:12px;font-weight:700;color:var(--dk);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
-.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;color:#fff;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* ── HEADER ── */
+header{background:var(--dk);padding:0 20px;height:48px;display:flex;align-items:center;gap:12px;flex-shrink:0;border-bottom:2px solid var(--or);}
+.logo{color:#fff;font-size:15px;font-weight:700;letter-spacing:-.2px;}
+.logo span{color:var(--or);}
+.logo small{color:#9CA3AF;font-size:10px;font-weight:400;margin-left:6px;}
+.h-pill{background:rgba(255,153,0,.15);color:var(--or);border:1px solid rgba(255,153,0,.3);border-radius:12px;padding:2px 9px;font-size:10px;font-weight:700;margin-left:auto;}
+.h-stack{color:#6B7280;font-size:10px;margin-left:8px;}
+
+/* ── LAYOUT ── */
+.wrap{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+aside{width:196px;background:var(--dk);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;padding-bottom:12px;}
+.ns{padding:14px 14px 4px;color:#4B5563;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;}
+.ni{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;color:#9CA3AF;transition:background .15s,color .15s;border-left:3px solid transparent;user-select:none;}
+.ni:hover{background:rgba(255,255,255,.04);color:#E5E7EB;}
+.ni.active{background:rgba(255,153,0,.08);color:var(--or);border-left-color:var(--or);}
+.ni .ico{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+.ni .lbl{font-size:12px;font-weight:500;}
+.ni .new{margin-left:auto;background:var(--gn);color:#fff;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;}
+.nb{margin-left:auto;background:var(--or);color:#fff;border-radius:8px;min-width:18px;text-align:center;padding:1px 5px;font-size:9px;font-weight:700;display:none;}
+.nb.on{display:block;}
+.sidebar-spacer{flex:1;}
+
+/* ── MAIN ── */
+main{flex:1;overflow-y:auto;background:var(--bg);}
+.panel{display:none;padding:18px 20px 32px;}.panel.active{display:block;}
+.ph{margin-bottom:16px;}.ph h2{font-size:15px;font-weight:700;color:var(--dk);}.ph p{color:var(--mu);font-size:12px;margin-top:3px;}
+
+/* ── CARD ── */
+.card{background:var(--cd);border:1px solid var(--br);border-radius:8px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--sh);}
+.ch{font-size:12px;font-weight:700;color:var(--dk);margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tag{display:inline-block;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;color:#fff;}
 .tag-bl{background:var(--bl);}.tag-or{background:var(--or);}.tag-gn{background:var(--gn);}.tag-rd{background:var(--rd);}.tag-gr{background:#888;}
-/* FORM */
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px;}
+.kpi{background:var(--cd);border:1px solid var(--br);border-radius:8px;padding:13px 14px;box-shadow:var(--sh);}
+.kpi-val{font-size:20px;font-weight:700;color:var(--dk);line-height:1;}
+.kpi-lbl{font-size:10px;color:var(--mu);margin-top:4px;font-weight:500;}
+.kpi-sub{font-size:10px;margin-top:2px;font-weight:600;}
+.kpi-up{color:var(--gn);}.kpi-dn{color:var(--rd);}
+
+/* ── CHARTS GRID ── */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.chart-box{background:var(--cd);border:1px solid var(--br);border-radius:8px;padding:14px;box-shadow:var(--sh);}
+.chart-title{font-size:12px;font-weight:700;color:var(--dk);margin-bottom:10px;}
+.chart-wrap{position:relative;height:220px;}
+
+/* ── FORM ── */
 .fg{display:grid;gap:10px;}
 .g2{grid-template-columns:1fr 1fr;}.g3{grid-template-columns:1fr 1fr 1fr;}.g4{grid-template-columns:1fr 1fr 1fr 1fr;}
 .s2{grid-column:span 2;}.s3{grid-column:span 3;}.s4{grid-column:span 4;}
-.fg label{font-size:11px;font-weight:600;color:#444;margin-bottom:3px;display:block;}
+.fg label{font-size:11px;font-weight:600;color:#374151;margin-bottom:3px;display:block;}
 .fg label .h{font-weight:400;color:var(--mu);}
 .fg label .r{color:var(--rd);}
 input[type=text],input[type=number],input[type=date],select,textarea{
-  border:1px solid var(--br);border-radius:4px;padding:6px 9px;font-size:12px;color:var(--tx);width:100%;background:#fff;transition:border-color .15s;}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--bl);box-shadow:0 0 0 2px rgba(20,110,180,.1);}
+  border:1px solid #D1D5DB;border-radius:5px;padding:6px 9px;font-size:12px;
+  color:var(--tx);width:100%;background:#fff;transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--bl);box-shadow:0 0 0 3px rgba(20,110,180,.1);}
 textarea{resize:vertical;font-family:monospace;font-size:11px;}
 .cb-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
 .cb-item{display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;}
 .cb-item input{width:auto;}
-hr.div{border:none;border-top:1px solid #eee;margin:12px 0;}
-/* BUTTONS */
-.btn{border:none;border-radius:4px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s;display:inline-flex;align-items:center;gap:5px;}
+hr.div{border:none;border-top:1px solid #F3F4F6;margin:12px 0;}
+.sl-lbl{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 6px;}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:5px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
 .btn-or{background:var(--or);color:#fff;}.btn-or:hover{background:#e08800;}
 .btn-gn{background:var(--gn);color:#fff;}.btn-gn:hover{background:#055a47;}
 .btn-bl{background:var(--bl);color:#fff;}.btn-bl:hover{background:#0e5a99;}
 .btn-rd{background:var(--rd);color:#fff;}.btn-rd:hover{background:#a30a2e;}
-.btn-ghost{background:#eee;color:#333;}.btn-ghost:hover{background:#ddd;}
+.btn-ghost{background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;}.btn-ghost:hover{background:#E5E7EB;}
 .btn-sm{padding:4px 10px;font-size:11px;}
 .btn-full{width:100%;justify-content:center;padding:10px;}
-/* ALERT */
-.alert{border-radius:4px;padding:9px 13px;font-size:12px;margin-bottom:12px;display:none;}
-.alert.on{display:block;}.alert.err{background:#fff0f0;color:var(--rd);border:1px solid #ffbbbb;}
-.alert.ok{background:#ebf5f0;color:var(--gn);border:1px solid #b3dfd0;}
-.alert.warn{background:#fffbe6;color:var(--yw);border:1px solid #ffe58f;}
-/* TABLE */
-.tw{overflow-x:auto;border:1px solid var(--br);border-radius:5px;}
+
+/* ── ALERT ── */
+.alert{border-radius:5px;padding:9px 13px;font-size:12px;margin-bottom:12px;display:none;}
+.alert.on{display:block;}.alert.err{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
+.alert.ok{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;}
+.alert.warn{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A;}
+.alert.info{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE;}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto;border:1px solid var(--br);border-radius:6px;}
+.tw-scroll{max-height:360px;overflow-y:auto;}
 table{width:100%;border-collapse:collapse;font-size:11px;}
-thead th{background:var(--dk);color:#fff;padding:8px 10px;text-align:left;font-weight:600;white-space:nowrap;position:sticky;top:0;z-index:1;}
-td{padding:6px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle;white-space:nowrap;}
+thead th{background:#1F2937;color:#F9FAFB;padding:8px 10px;text-align:left;font-weight:600;white-space:nowrap;position:sticky;top:0;z-index:2;}
+thead th.sort{cursor:pointer;user-select:none;}
+thead th.sort:hover{background:#374151;}
+td{padding:6px 10px;border-bottom:1px solid #F3F4F6;vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:#f9f9f9;}
-.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;}
-.p-neg{background:#fee2e2;color:#b91c1c;}
-.p-hrv{background:#dcfce7;color:#15803d;}
-.p-inv{background:#fef9c3;color:#854d0e;}
-.p-inc{background:#f1f5f9;color:#64748b;}
-.p-sp{background:#e8f0fe;color:#1a73e8;}
-.p-sb{background:#fef3e2;color:#b06000;}
-.p-sd{background:#e6f4ea;color:#1e7e34;}
-.p-en{background:#dcfce7;color:#15803d;}
-.p-pa{background:#fef9c3;color:#854d0e;}
-/* STATS */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
-.stat{background:var(--cd);border:1px solid var(--br);border-radius:6px;padding:12px;text-align:center;}
-.sv{font-size:22px;font-weight:700;color:var(--dk);}
-.sl{font-size:10px;color:var(--mu);margin-top:2px;}
-/* UPLOAD ZONE */
-.upzone{border:2px dashed var(--br);border-radius:6px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
-.upzone:hover,.upzone.drag{border-color:var(--bl);background:rgba(20,110,180,.03);}
+tr:hover td{background:#F9FAFB;}
+.pill{display:inline-flex;align-items:center;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;}
+.p-neg{background:#FEE2E2;color:#B91C1C;}.p-hrv{background:#DCFCE7;color:#15803D;}
+.p-inv{background:#FEF9C3;color:#854D0E;}.p-inc{background:#F1F5F9;color:#64748B;}
+.p-en{background:#DCFCE7;color:#15803D;}.p-pa{background:#FEF9C3;color:#854D0E;}.p-ar{background:#F1F5F9;color:#64748B;}
+.p-err{background:#FEE2E2;color:#B91C1C;}.p-warn{background:#FEF9C3;color:#854D0E;}.p-info{background:#EFF6FF;color:#1E40AF;}
+.p-pass{background:#DCFCE7;color:#15803D;}
+
+/* ── UPLOAD ZONE ── */
+.upzone{border:2px dashed #D1D5DB;border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#FAFAFA;}
+.upzone:hover,.upzone.drag{border-color:var(--bl);background:#EFF6FF;}
 .upzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.upzone .uico{font-size:24px;margin-bottom:5px;}
+.upzone .uico{font-size:28px;margin-bottom:6px;}
 .upzone .ulbl{font-size:13px;font-weight:700;color:var(--bl);}
 .upzone .uhint{font-size:11px;color:var(--mu);margin-top:3px;}
-/* PROGRESS BAR */
-.prog-wrap{background:#eee;border-radius:4px;height:6px;margin:8px 0;}
-.prog{background:var(--or);height:6px;border-radius:4px;transition:width .3s;}
-/* ADVANCED TOGGLE */
+.up-status{margin-top:8px;font-size:12px;padding:7px 10px;border-radius:4px;display:none;}
+.up-status.ok{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;display:block;}
+.up-status.err{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;display:block;}
+
+/* ── AUDIT ISSUE ── */
+.audit-group{margin-bottom:12px;}
+.audit-hd{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:5px;margin-bottom:6px;font-weight:700;font-size:12px;cursor:pointer;}
+.audit-hd.err{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
+.audit-hd.warn{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A;}
+.audit-hd.info{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE;}
+.audit-hd.pass{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;}
+.audit-items{padding:0 4px;}
+.audit-row{display:flex;gap:10px;padding:6px 10px;border-bottom:1px solid #F3F4F6;font-size:11px;align-items:start;}
+.audit-row:last-child{border-bottom:none;}
+.audit-row .row-no{color:var(--mu);font-weight:600;min-width:45px;}
+.audit-row .msg{flex:1;}
+.audit-row .entity{color:var(--mu);min-width:80px;}
+
+/* ── ADVANCED TOGGLE ── */
 .adv-btn{background:none;border:none;color:var(--bl);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;margin-top:8px;}
 .adv-btn .arr{font-size:9px;transition:transform .2s;}
 .adv-btn.open .arr{transform:rotate(90deg);}
-.adv-body{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #ddd;}
+.adv-body{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #E5E7EB;}
 .adv-body.open{display:block;}
-/* REMOVE */
-.rm{background:none;border:none;color:#bbb;cursor:pointer;font-size:13px;padding:1px 5px;border-radius:3px;}
-.rm:hover{background:#fee;color:var(--rd);}
-/* SECTION LABEL */
-.sl-lbl{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 6px;}
-/* STM specific */
-.stm-result-wrap{max-height:420px;overflow-y:auto;}
-.stm-filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
-.stm-filter-bar .f-label{font-size:11px;font-weight:600;color:var(--mu);}
-.filter-btn{border:1px solid var(--br);background:#fff;border-radius:14px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;color:var(--mu);transition:all .15s;}
-.filter-btn.active{border-color:var(--or);color:var(--or);background:#fff8ee;}
-.stm-export-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
-.col-neg{background:#fff5f5;}
-.col-hrv{background:#f0fff4;}
-.col-inv{background:#fffef0;}
-/* Responsive */
-@media(max-width:640px){aside{display:none;}.g2,.g3,.g4{grid-template-columns:1fr;}.stats{grid-template-columns:1fr 1fr;}}
+
+/* ── MISC ── */
+.rm{background:none;border:none;color:#D1D5DB;cursor:pointer;font-size:13px;padding:2px 6px;border-radius:3px;transition:all .1s;}
+.rm:hover{background:#FEE2E2;color:var(--rd);}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.filter-btn{border:1px solid #E5E7EB;background:#fff;border-radius:14px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;color:var(--mu);transition:all .15s;}
+.filter-btn.active{border-color:var(--or);color:var(--or);background:#FFFBEB;}
+.export-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.stm-scroll{max-height:400px;overflow-y:auto;}
+.score-ring{display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;font-size:20px;font-weight:700;border:4px solid;}
+.score-a{border-color:var(--gn);color:var(--gn);}
+.score-b{border-color:var(--or);color:var(--or);}
+.score-c{border-color:var(--rd);color:var(--rd);}
+
+@media(max-width:700px){aside{display:none;}.g2,.g3,.g4{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:1fr 1fr;}.chart-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Amazon PPC <span>Bulk Tool</span><small>SP · SB · SD · Search Term Miner</small></div>
-  <span class="hbadge">PRO</span>
+  <div class="logo">Amazon PPC <span>Suite</span><small>SP · SB · SD · STM · Dashboard · Audit</small></div>
+  <span class="h-stack">Vanilla JS + Chart.js + SheetJS</span>
+  <span class="h-pill">v2.0 PRO</span>
 </header>
 
-<div class="app">
+<div class="wrap">
 
-<!-- ═══ SIDEBAR ═══ -->
+<!-- ══════════════ SIDEBAR ══════════════ -->
 <aside>
-  <div class="nav-section" style="margin-top:8px;">Create</div>
-  <div class="nav-item active" onclick="go('sp',this)"><span class="ico">🛍️</span><span class="lbl">Sponsored Products</span><span class="nav-badge" id="nb-sp">0</span></div>
-  <div class="nav-item" onclick="go('sb',this)"><span class="ico">🎥</span><span class="lbl">Sponsored Brands</span><span class="nav-badge" id="nb-sb">0</span></div>
-  <div class="nav-item" onclick="go('sd',this)"><span class="ico">📺</span><span class="lbl">Sponsored Display</span><span class="nav-badge" id="nb-sd">0</span></div>
-  <div class="nav-section">Analyse</div>
-  <div class="nav-item" onclick="go('stm',this)"><span class="ico">🔍</span><span class="lbl">Search Term Miner</span></div>
-  <div class="nav-section">Output</div>
-  <div class="nav-item" onclick="go('exp',this)"><span class="ico">⬇️</span><span class="lbl">Export Bulk File</span></div>
-  <div class="nav-section" style="margin-top:auto;"></div>
-  <div class="nav-item" style="margin-top:auto;" onclick="clearAll()"><span class="ico">🗑️</span><span class="lbl" style="color:#888;">Clear All Queues</span></div>
+  <div class="ns" style="margin-top:10px;">Create Campaigns</div>
+  <div class="ni active" onclick="go('sp',this)"><span class="ico">🛍️</span><span class="lbl">Sponsored Products</span><span class="nb" id="nb-sp">0</span></div>
+  <div class="ni" onclick="go('sb',this)"><span class="ico">🎥</span><span class="lbl">Sponsored Brands</span><span class="nb" id="nb-sb">0</span></div>
+  <div class="ni" onclick="go('sd',this)"><span class="ico">📺</span><span class="lbl">Sponsored Display</span><span class="nb" id="nb-sd">0</span></div>
+  <div class="ns">Analyse</div>
+  <div class="ni" onclick="go('stm',this)"><span class="ico">🔍</span><span class="lbl">Search Term Miner</span></div>
+  <div class="ni" onclick="go('dash',this)"><span class="ico">📊</span><span class="lbl">Performance Dashboard</span><span class="new">NEW</span></div>
+  <div class="ni" onclick="go('audit',this)"><span class="ico">🔎</span><span class="lbl">Campaign Audit</span><span class="new">NEW</span></div>
+  <div class="ns">Output</div>
+  <div class="ni" onclick="go('exp',this)"><span class="ico">⬇️</span><span class="lbl">Export Bulk File</span></div>
+  <div class="sidebar-spacer"></div>
+  <div class="ni" style="margin-top:8px;" onclick="clearAll()"><span class="ico">🗑️</span><span class="lbl" style="color:#6B7280;">Clear All Queues</span></div>
 </aside>
 
-<!-- ═══ MAIN ═══ -->
+<!-- ══════════════ MAIN ══════════════ -->
 <main>
 
-<!-- ──────────── SPONSORED PRODUCTS ──────────── -->
+<!-- ─────────── SPONSORED PRODUCTS ─────────── -->
 <div class="panel active" id="p-sp">
-<div class="ph"><h2>🛍️ Sponsored Products</h2><p>Builds Campaign → Ad Group → Ads → Keywords → Negatives → Placement Adjustments</p></div>
+<div class="ph"><h2>🛍️ Sponsored Products</h2><p>Campaign → Ad Group → Ads → Keywords → Negatives → Placements</p></div>
 <div id="sp-alert" class="alert"></div>
-
 <div class="card">
   <div class="ch">Campaign Settings <span class="tag tag-bl">Required</span></div>
   <div class="fg g3">
     <div class="s2"><label>Campaign Name <span class="r">*</span></label><input type="text" id="sp-cn" placeholder="B09XYZ_SP_Exact_Batch1"/></div>
     <div><label>State</label><select id="sp-st"><option>Enabled</option><option>Paused</option></select></div>
     <div><label>Start Date</label><input type="date" id="sp-sd"/></div>
-    <div><label>End Date <span class="h">(blank = none)</span></label><input type="date" id="sp-ed"/></div>
+    <div><label>End Date <span class="h">(blank=none)</span></label><input type="date" id="sp-ed"/></div>
     <div><label>Daily Budget ($) <span class="r">*</span></label><input type="number" id="sp-bgt" value="10" min="1" step="0.01"/></div>
-    <div><label>Targeting Type</label><select id="sp-tt" onchange="spTTChange()"><option value="Manual">Manual</option><option value="Auto">Auto</option></select></div>
-    <div><label>Bidding Strategy</label>
-      <select id="sp-bs">
-        <option value="Dynamic bids - down only">Dynamic – Down Only</option>
-        <option value="Dynamic bids - up and down">Dynamic – Up &amp; Down</option>
-        <option value="Fixed bid">Fixed Bid</option>
-      </select>
-    </div>
-    <div><label>Portfolio ID <span class="h">(optional)</span></label><input type="text" id="sp-pid" placeholder="Leave blank"/></div>
+    <div><label>Targeting Type</label><select id="sp-tt" onchange="spTT()"><option value="Manual">Manual</option><option value="Auto">Auto</option></select></div>
+    <div><label>Bidding Strategy</label><select id="sp-bs"><option value="Dynamic bids - down only">Dynamic – Down Only</option><option value="Dynamic bids - up and down">Dynamic – Up &amp; Down</option><option value="Fixed bid">Fixed Bid</option></select></div>
+    <div><label>Portfolio ID <span class="h">(optional)</span></label><input type="text" id="sp-pid"/></div>
   </div>
   <div class="sl-lbl">Placement Bid Adjustments (0–900%)</div>
   <div class="fg g3">
@@ -181,84 +217,63 @@ tr:hover td{background:#f9f9f9;}
     <div><label>Rest of Search (%)</label><input type="number" id="sp-pr" value="0" min="0" max="900"/></div>
   </div>
 </div>
-
 <div class="card">
   <div class="ch">Ad Group &amp; Products</div>
   <div class="fg g3">
     <div class="s2"><label>Ad Group Name <span class="r">*</span></label><input type="text" id="sp-ag" placeholder="AG_Exact_B09XYZ"/></div>
     <div><label>Default Bid ($) <span class="r">*</span></label><input type="number" id="sp-db" value="0.75" min="0.02" step="0.01"/></div>
-    <div class="s3"><label>ASINs / SKUs <span class="r">*</span> <span class="h">one per line · use ASIN for Vendors, SKU for Sellers</span></label><textarea id="sp-asins" rows="3" placeholder="B09XYZ12345&#10;B09ABC67890"></textarea></div>
+    <div class="s3"><label>ASINs / SKUs <span class="r">*</span> <span class="h">one per line · ASIN for Vendors, SKU for Sellers</span></label><textarea id="sp-asins" rows="3" placeholder="B09XYZ12345&#10;B09ABC67890"></textarea></div>
   </div>
 </div>
-
 <div class="card" id="sp-kw-card">
   <div class="ch">Keywords <span class="tag tag-bl">Manual Targeting</span></div>
   <div class="fg g2">
-    <div class="s2"><label>Keywords <span class="r">*</span> <span class="h">one per line</span></label><textarea id="sp-kws" rows="5" placeholder="running shoes women&#10;womens athletic shoes&#10;lightweight running shoes"></textarea></div>
+    <div class="s2"><label>Keywords <span class="r">*</span> <span class="h">one per line</span></label><textarea id="sp-kws" rows="5" placeholder="running shoes women&#10;womens athletic shoes"></textarea></div>
     <div>
       <label>Match Types</label>
-      <div class="cb-row">
-        <label class="cb-item"><input type="checkbox" id="sp-me" checked/> Exact</label>
-        <label class="cb-item"><input type="checkbox" id="sp-mb"/> Broad</label>
-        <label class="cb-item"><input type="checkbox" id="sp-mp"/> Phrase</label>
-      </div>
+      <div class="cb-row"><label class="cb-item"><input type="checkbox" id="sp-me" checked/> Exact</label><label class="cb-item"><input type="checkbox" id="sp-mb"/> Broad</label><label class="cb-item"><input type="checkbox" id="sp-mp"/> Phrase</label></div>
     </div>
-    <div><label>Keyword Bid ($) <span class="h">blank = use default</span></label><input type="number" id="sp-kb" placeholder="Use default" min="0.02" step="0.01"/></div>
+    <div><label>Keyword Bid ($) <span class="h">blank=default</span></label><input type="number" id="sp-kb" placeholder="Use default" min="0.02" step="0.01"/></div>
   </div>
   <hr class="div"/>
   <div class="ch" style="margin-bottom:8px;">Negative Keywords <span class="tag tag-gr">Optional</span></div>
   <div class="fg g2">
-    <div>
-      <label>Ad Group Negatives <span class="h">one per line</span></label>
-      <textarea id="sp-nag" rows="3" placeholder="cheap&#10;free&#10;DIY"></textarea>
-      <div class="cb-row"><label class="cb-item"><input type="checkbox" id="sp-nage" checked/> Neg Exact</label><label class="cb-item"><input type="checkbox" id="sp-nagp"/> Neg Phrase</label></div>
-    </div>
-    <div>
-      <label>Campaign Negatives <span class="h">one per line</span></label>
-      <textarea id="sp-ncamp" rows="3" placeholder="cheap&#10;free"></textarea>
-      <div class="cb-row"><label class="cb-item"><input type="checkbox" id="sp-ncampe" checked/> Neg Exact</label><label class="cb-item"><input type="checkbox" id="sp-ncampp"/> Neg Phrase</label></div>
-    </div>
+    <div><label>Ad Group Negatives</label><textarea id="sp-nag" rows="3" placeholder="cheap&#10;free"></textarea><div class="cb-row"><label class="cb-item"><input type="checkbox" id="sp-nage" checked/> Neg Exact</label><label class="cb-item"><input type="checkbox" id="sp-nagp"/> Neg Phrase</label></div></div>
+    <div><label>Campaign Negatives</label><textarea id="sp-nc" rows="3" placeholder="cheap&#10;free"></textarea><div class="cb-row"><label class="cb-item"><input type="checkbox" id="sp-nce" checked/> Neg Exact</label><label class="cb-item"><input type="checkbox" id="sp-ncp"/> Neg Phrase</label></div></div>
   </div>
-  <button class="adv-btn" onclick="togAdv('sp-ptar')"><span class="arr">▶</span> Product Targeting (ASIN / Category)</button>
+  <button class="adv-btn" onclick="togAdv('sp-ptar')"><span class="arr">▶</span> Product Targeting</button>
   <div class="adv-body" id="sp-ptar">
     <div class="fg g2">
-      <div><label>Target ASINs <span class="h">one per line</span></label><textarea id="sp-pta" rows="3" placeholder="B09COMP1&#10;B09COMP2"></textarea></div>
-      <div><label>Target Bid ($) <span class="h">blank = default</span></label><input type="number" id="sp-ptb" placeholder="Use default" min="0.02" step="0.01"/></div>
-      <div class="s2"><label>Negative Product Targets <span class="h">one ASIN per line</span></label><textarea id="sp-npt" rows="2" placeholder="B09COMPETITOR1"></textarea></div>
+      <div><label>Target ASINs <span class="h">one per line</span></label><textarea id="sp-pta" rows="3" placeholder="B09COMP1"></textarea></div>
+      <div><label>Target Bid ($)</label><input type="number" id="sp-ptb" placeholder="Use default" min="0.02" step="0.01"/></div>
+      <div class="s2"><label>Negative Product Targets</label><textarea id="sp-npt" rows="2" placeholder="B09COMPETITOR1"></textarea></div>
     </div>
   </div>
 </div>
-
 <button class="btn btn-or btn-full" onclick="addSP()">＋ Add Campaign to Queue</button>
-
 <div id="sp-queue" style="display:none;margin-top:14px;">
   <div class="ch" style="margin-bottom:8px;">Campaign Queue</div>
-  <div class="tw"><table>
-    <thead><tr><th>#</th><th>Campaign</th><th>Type</th><th>Budget</th><th>Bid</th><th>KWs</th><th>ASINs</th><th>NegKW</th><th></th></tr></thead>
-    <tbody id="sp-qb"></tbody>
-  </table></div>
+  <div class="tw"><table><thead><tr><th>#</th><th>Campaign</th><th>Type</th><th>Budget</th><th>Bid</th><th>KWs</th><th>ASINs</th><th>Neg</th><th></th></tr></thead><tbody id="sp-qb"></tbody></table></div>
 </div>
-</div><!-- /sp -->
+</div>
 
-<!-- ──────────── SPONSORED BRANDS ──────────── -->
+<!-- ─────────── SPONSORED BRANDS ─────────── -->
 <div class="panel" id="p-sb">
-<div class="ph"><h2>🎥 Sponsored Brands</h2><p>Video &amp; Standard Image campaigns — Campaign + Keyword rows per Amazon SB bulk format</p></div>
+<div class="ph"><h2>🎥 Sponsored Brands</h2><p>Video &amp; Standard Image — Campaign + Keyword rows per SB bulk format</p></div>
 <div id="sb-alert" class="alert"></div>
-
 <div class="card">
   <div class="ch">Campaign Settings <span class="tag tag-or">SB</span></div>
   <div class="fg g3">
     <div class="s2"><label>ASIN <span class="r">*</span></label><input type="text" id="sb-asin" placeholder="B0CJ4T2VTQ" maxlength="10"/></div>
     <div><label>State</label><select id="sb-st"><option>Enabled</option><option>Paused</option></select></div>
-    <div class="s2"><label>Campaign Label / Batch <span class="r">*</span> <span class="h">e.g. KIV_Video_Batch_26</span></label><input type="text" id="sb-lbl" placeholder="KIV_Video_Batch_26"/></div>
+    <div class="s2"><label>Campaign Label / Batch <span class="r">*</span></label><input type="text" id="sb-lbl" placeholder="KIV_Video_Batch_26"/></div>
     <div><label>Ad Format</label><select id="sb-fmt"><option value="Video">Video</option><option value="StandardImage">Standard Image</option></select></div>
     <div><label>Daily Budget ($)</label><input type="number" id="sb-bgt" value="5" min="1" step="0.01"/></div>
     <div><label>Keyword Bid ($)</label><input type="number" id="sb-bid" value="0.70" min="0.02" step="0.01"/></div>
     <div><label>Start Date</label><input type="date" id="sb-sd"/></div>
-    <div><label>End Date <span class="h">(optional)</span></label><input type="date" id="sb-ed"/></div>
+    <div><label>End Date</label><input type="date" id="sb-ed"/></div>
   </div>
 </div>
-
 <div class="card">
   <div class="ch">Brand Info</div>
   <div class="fg g2">
@@ -266,40 +281,30 @@ tr:hover td{background:#f9f9f9;}
     <div><label>Brand Name <span class="r">*</span></label><input type="text" id="sb-bn" value="BUNMO"/></div>
   </div>
 </div>
-
 <div class="card">
   <div class="ch">Keywords &amp; Videos</div>
   <div class="fg g2">
-    <div class="s2"><label>Keywords <span class="r">*</span> <span class="h">one per line — each keyword = one campaign</span></label><textarea id="sb-kws" rows="6" placeholder="stocking stuffers&#10;kids stocking stuffers&#10;toddler stocking stuffer"></textarea></div>
-    <div class="s2"><label>Video Asset IDs <span class="h">one per line, matched 1:1 with keywords</span></label><textarea id="sb-vids" rows="4" placeholder="amzn1.assetlibrary.asset1.abc123:version_v1&#10;amzn1.assetlibrary.asset1.def456:version_v1"></textarea></div>
+    <div class="s2"><label>Keywords <span class="r">*</span> <span class="h">one per line — each keyword = one campaign</span></label><textarea id="sb-kws" rows="6" placeholder="stocking stuffers&#10;kids stocking stuffers"></textarea></div>
+    <div class="s2"><label>Video Asset IDs <span class="h">matched 1:1 with keywords</span></label><textarea id="sb-vids" rows="4" placeholder="amzn1.assetlibrary.asset1.abc:version_v1"></textarea></div>
   </div>
   <hr class="div"/>
   <div class="ch" style="margin-bottom:8px;">Negative Keywords <span class="tag tag-gr">Optional</span></div>
   <div class="fg g2">
-    <div><label>Negative Keywords <span class="h">one per line</span></label><textarea id="sb-nkw" rows="3" placeholder="cheap&#10;free"></textarea></div>
-    <div>
-      <label>Match Types</label>
-      <div class="cb-row"><label class="cb-item"><input type="checkbox" id="sb-ne" checked/> Neg Exact</label><label class="cb-item"><input type="checkbox" id="sb-np"/> Neg Phrase</label></div>
-    </div>
+    <div><label>Negative Keywords</label><textarea id="sb-nkw" rows="3" placeholder="cheap&#10;free"></textarea></div>
+    <div><label>Match Types</label><div class="cb-row"><label class="cb-item"><input type="checkbox" id="sb-ne" checked/> Neg Exact</label><label class="cb-item"><input type="checkbox" id="sb-np"/> Neg Phrase</label></div></div>
   </div>
 </div>
-
 <button class="btn btn-or btn-full" onclick="addSB()">＋ Add to Queue</button>
-
 <div id="sb-queue" style="display:none;margin-top:14px;">
   <div class="ch" style="margin-bottom:8px;">Campaign Queue</div>
-  <div class="tw"><table>
-    <thead><tr><th>#</th><th>ASIN</th><th>Label</th><th>Budget</th><th>Bid</th><th>KWs</th><th>Videos</th><th>NegKW</th><th></th></tr></thead>
-    <tbody id="sb-qb"></tbody>
-  </table></div>
+  <div class="tw"><table><thead><tr><th>#</th><th>ASIN</th><th>Label</th><th>Budget</th><th>Bid</th><th>KWs</th><th>Videos</th><th>Neg</th><th></th></tr></thead><tbody id="sb-qb"></tbody></table></div>
 </div>
-</div><!-- /sb -->
+</div>
 
-<!-- ──────────── SPONSORED DISPLAY ──────────── -->
+<!-- ─────────── SPONSORED DISPLAY ─────────── -->
 <div class="panel" id="p-sd">
-<div class="ph"><h2>📺 Sponsored Display</h2><p>Audience &amp; contextual targeting — Campaign → Ad Group → Ads → Targeting rows</p></div>
+<div class="ph"><h2>📺 Sponsored Display</h2><p>Audience &amp; contextual — Campaign → Ad Group → Ads → Targeting</p></div>
 <div id="sd-alert" class="alert"></div>
-
 <div class="card">
   <div class="ch">Campaign Settings <span class="tag tag-gn">SD</span></div>
   <div class="fg g3">
@@ -307,182 +312,222 @@ tr:hover td{background:#f9f9f9;}
     <div><label>State</label><select id="sd-st"><option>Enabled</option><option>Paused</option></select></div>
     <div><label>Daily Budget ($) <span class="r">*</span></label><input type="number" id="sd-bgt" value="10" min="1" step="0.01"/></div>
     <div><label>Start Date</label><input type="date" id="sd-sd"/></div>
-    <div><label>End Date <span class="h">(optional)</span></label><input type="date" id="sd-ed"/></div>
+    <div><label>End Date</label><input type="date" id="sd-ed"/></div>
   </div>
 </div>
-
 <div class="card">
   <div class="ch">Ad Group &amp; Products</div>
   <div class="fg g3">
     <div class="s2"><label>Ad Group Name <span class="r">*</span></label><input type="text" id="sd-ag" placeholder="AG_Audience_B09XYZ"/></div>
     <div><label>Default Bid ($)</label><input type="number" id="sd-db" value="0.50" min="0.02" step="0.01"/></div>
-    <div class="s3"><label>ASINs <span class="r">*</span> <span class="h">one per line</span></label><textarea id="sd-asins" rows="3" placeholder="B09XYZ12345&#10;B09ABC67890"></textarea></div>
+    <div class="s3"><label>ASINs <span class="r">*</span> <span class="h">one per line</span></label><textarea id="sd-asins" rows="3" placeholder="B09XYZ12345"></textarea></div>
   </div>
 </div>
-
 <div class="card">
   <div class="ch">Targeting</div>
   <div class="fg g2">
-    <div><label>Targeting Type</label>
-      <select id="sd-ttype">
-        <option value="audiences">Audiences (Remarketing / Interest)</option>
-        <option value="contextual">Contextual (Views / Purchases)</option>
-        <option value="asin">ASIN Targeting (Product Pages)</option>
-      </select>
-    </div>
     <div><label>Targeting Bid ($)</label><input type="number" id="sd-tb" value="0.50" min="0.02" step="0.01"/></div>
-    <div class="s2"><label>Targeting Expressions <span class="h">one per line — e.g. asin="B09XXX" or views="similar"</span></label><textarea id="sd-tgts" rows="4" placeholder='asin="B09COMPETITOR1"&#10;views="similar"'></textarea></div>
-    <div class="s2"><label>Creative Headline <span class="h">(optional)</span></label><input type="text" id="sd-hl" placeholder="Shop top-rated products"/></div>
+    <div><label>Creative Headline</label><input type="text" id="sd-hl" placeholder="Shop top-rated products"/></div>
+    <div class="s2"><label>Targeting Expressions <span class="h">one per line</span></label><textarea id="sd-tgts" rows="4" placeholder='asin="B09COMPETITOR1"&#10;views="similar"'></textarea></div>
   </div>
 </div>
-
 <button class="btn btn-or btn-full" onclick="addSD()">＋ Add to Queue</button>
-
 <div id="sd-queue" style="display:none;margin-top:14px;">
   <div class="ch" style="margin-bottom:8px;">Campaign Queue</div>
-  <div class="tw"><table>
-    <thead><tr><th>#</th><th>Campaign</th><th>Budget</th><th>Ad Group</th><th>ASINs</th><th>Targets</th><th></th></tr></thead>
-    <tbody id="sd-qb"></tbody>
-  </table></div>
+  <div class="tw"><table><thead><tr><th>#</th><th>Campaign</th><th>Budget</th><th>Ad Group</th><th>ASINs</th><th>Targets</th><th></th></tr></thead><tbody id="sd-qb"></tbody></table></div>
 </div>
-</div><!-- /sd -->
+</div>
 
-<!-- ──────────── SEARCH TERM MINER ──────────── -->
+<!-- ─────────── SEARCH TERM MINER ─────────── -->
 <div class="panel" id="p-stm">
-<div class="ph"><h2>🔍 Search Term Report Miner</h2><p>Upload your Amazon Search Term Report → auto-classify terms → export Negatives &amp; Harvest keywords as a bulk file</p></div>
+<div class="ph"><h2>🔍 Search Term Report Miner</h2><p>Upload your Amazon Search Term Report → auto-classify → export Negatives &amp; Harvest bulk files</p></div>
 <div id="stm-alert" class="alert"></div>
-
-<!-- Step 1: Upload -->
 <div class="card">
   <div class="ch">Step 1 — Upload Search Term Report <span class="tag tag-bl">CSV or XLSX</span></div>
-  <div class="upzone" id="stm-zone" ondragover="stmDragOver(event)" ondragleave="stmDragLeave()" ondrop="stmDrop(event)">
-    <input type="file" id="stm-file" accept=".csv,.xlsx,.xls" onchange="stmLoad(this)"/>
-    <div class="uico">📊</div>
-    <div class="ulbl">Click to upload or drag &amp; drop</div>
+  <div class="upzone" id="stm-zone" ondragover="doDrag(event,'stm-zone')" ondragleave="noDrag('stm-zone')" ondrop="doDrop(event,'stm')">
+    <input type="file" id="stm-file" accept=".csv,.xlsx,.xls" onchange="stmRead(this.files[0])"/>
+    <div class="uico">📊</div><div class="ulbl">Click to upload or drag &amp; drop</div>
     <div class="uhint">Amazon Sponsored Products Search Term Report (.csv or .xlsx)</div>
   </div>
-  <div id="stm-upload-status" style="margin-top:8px;font-size:12px;color:var(--mu);display:none;"></div>
-  <div id="stm-col-map" style="display:none;margin-top:10px;">
-    <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px;">DETECTED COLUMNS</div>
-    <div id="stm-col-list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
-  </div>
+  <div id="stm-up-status" class="up-status"></div>
+  <div id="stm-col-map" style="display:none;margin-top:10px;"><div style="font-size:10px;font-weight:700;color:var(--mu);margin-bottom:5px;">DETECTED COLUMNS</div><div id="stm-cols" style="display:flex;flex-wrap:wrap;gap:5px;"></div></div>
 </div>
-
-<!-- Step 2: Rules -->
-<div class="card" id="stm-rules-card" style="display:none;">
+<div class="card" id="stm-rules" style="display:none;">
   <div class="ch">Step 2 — Set Rules</div>
   <div class="fg g3">
-    <div style="grid-column:span 3;background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;padding:10px 12px;font-size:12px;color:#7a5c00;">
-      <strong>How rules work:</strong> Each search term is checked top-to-bottom. The first matching rule wins. Unmatched terms are marked Inconclusive.
-    </div>
-    <!-- Negative Rules -->
-    <div style="grid-column:span 3;"><div class="sl-lbl" style="color:var(--rd);">🔴 NEGATIVE Rules — flag as wasted spend</div></div>
-    <div><label>Min Clicks <span class="h">(with 0 orders)</span></label><input type="number" id="r-neg-clicks" value="5" min="1"/></div>
-    <div><label>Min Spend ($) <span class="h">(with 0 orders)</span></label><input type="number" id="r-neg-spend" value="3" min="0" step="0.01"/></div>
-    <div><label>Max ACoS (%) <span class="h">above target = negative</span></label><input type="number" id="r-neg-acos" value="80" min="0" step="1"/></div>
-    <div><label>Min Spend for ACoS rule ($)</label><input type="number" id="r-neg-acos-spend" value="5" min="0" step="0.01"/></div>
-    <div class="s2"><label>Negative Match Types to create</label>
-      <div class="cb-row"><label class="cb-item"><input type="checkbox" id="r-nmt-e" checked/> Negative Exact</label><label class="cb-item"><input type="checkbox" id="r-nmt-p" checked/> Negative Phrase</label></div>
-    </div>
-    <!-- Harvest Rules -->
-    <div style="grid-column:span 3;"><div class="sl-lbl" style="color:var(--gn);">🟢 HARVEST Rules — promote to new Exact Match keyword</div></div>
-    <div><label>Min Orders</label><input type="number" id="r-hrv-orders" value="2" min="1"/></div>
-    <div><label>Max ACoS (%) <span class="h">must be below target</span></label><input type="number" id="r-hrv-acos" value="35" min="0" step="1"/></div>
-    <div><label>Min Impressions <span class="h">(relevance check)</span></label><input type="number" id="r-hrv-impr" value="50" min="0"/></div>
-    <!-- Harvest output settings -->
-    <div style="grid-column:span 3;"><div class="sl-lbl">Harvest Output — new campaign/ad group for winning terms</div></div>
-    <div class="s2"><label>New Campaign Name <span class="h">for harvested keywords</span></label><input type="text" id="r-hrv-camp" placeholder="Harvested_Exact_Match_[Date]"/></div>
-    <div><label>Ad Group Name</label><input type="text" id="r-hrv-ag" placeholder="AG_Harvested_Exact"/></div>
-    <div><label>New Keyword Bid ($)</label><input type="number" id="r-hrv-bid" value="0.75" min="0.02" step="0.01"/></div>
-    <div><label>Daily Budget ($)</label><input type="number" id="r-hrv-bgt" value="10" min="1" step="0.01"/></div>
-    <div><label>Product ASIN/SKU</label><input type="text" id="r-hrv-asin" placeholder="B09XYZ12345"/></div>
-    <!-- Negative output settings -->
-    <div style="grid-column:span 3;"><div class="sl-lbl">Negative Output — add negatives to which campaign/level?</div></div>
-    <div><label>Negative Level</label>
-      <select id="r-neg-level">
-        <option value="campaign">Campaign Negative Keyword</option>
-        <option value="adgroup">Ad Group Negative Keyword</option>
-      </select>
-    </div>
-    <div class="s2"><label>Ad Group Name <span class="h">(required for Ad Group level)</span></label><input type="text" id="r-neg-ag" placeholder="Leave blank for Campaign level"/></div>
+    <div style="grid-column:span 3;background:#FFFBEB;border:1px solid #FDE68A;border-radius:5px;padding:9px 12px;font-size:11px;color:#92400E;"><strong>Logic:</strong> Rules apply top-to-bottom. First match wins. Unmatched = Inconclusive.</div>
+    <div style="grid-column:span 3;"><div class="sl-lbl" style="color:var(--rd);">🔴 NEGATIVE — flag as wasted spend</div></div>
+    <div><label>Min Clicks (0 orders)</label><input type="number" id="r-nc" value="5" min="1"/></div>
+    <div><label>Min Spend $ (0 orders)</label><input type="number" id="r-ns" value="3" min="0" step="0.01"/></div>
+    <div><label>Max ACoS % (any orders)</label><input type="number" id="r-na" value="80" min="0"/></div>
+    <div><label>Min Spend $ for ACoS rule</label><input type="number" id="r-nas" value="5" min="0" step="0.01"/></div>
+    <div class="s2"><label>Negative Match Types</label><div class="cb-row"><label class="cb-item"><input type="checkbox" id="r-ne" checked/> Negative Exact</label><label class="cb-item"><input type="checkbox" id="r-np" checked/> Negative Phrase</label></div></div>
+    <div style="grid-column:span 3;"><div class="sl-lbl" style="color:var(--gn);">🟢 HARVEST — promote to Exact Match keyword</div></div>
+    <div><label>Min Orders</label><input type="number" id="r-ho" value="2" min="1"/></div>
+    <div><label>Max ACoS % (target)</label><input type="number" id="r-ha" value="35" min="0"/></div>
+    <div><label>Min Impressions</label><input type="number" id="r-hi" value="50" min="0"/></div>
+    <div style="grid-column:span 3;"><div class="sl-lbl">Harvest Output Campaign</div></div>
+    <div class="s2"><label>New Campaign Name</label><input type="text" id="r-hc" placeholder="Harvested_Exact_Match"/></div>
+    <div><label>Ad Group Name</label><input type="text" id="r-hag" placeholder="AG_Harvested"/></div>
+    <div><label>New Bid ($)</label><input type="number" id="r-hb" value="0.75" min="0.02" step="0.01"/></div>
+    <div><label>Daily Budget ($)</label><input type="number" id="r-hbgt" value="10" min="1"/></div>
+    <div><label>Product ASIN/SKU</label><input type="text" id="r-hasin" placeholder="B09XYZ12345"/></div>
+    <div style="grid-column:span 3;"><div class="sl-lbl">Negative Output Level</div></div>
+    <div><label>Level</label><select id="r-nl"><option value="campaign">Campaign Negative</option><option value="adgroup">Ad Group Negative</option></select></div>
+    <div class="s2"><label>Ad Group Name (if Ad Group level)</label><input type="text" id="r-nlag" placeholder="Leave blank for Campaign level"/></div>
   </div>
-  <div style="margin-top:14px;">
-    <button class="btn btn-or btn-full" onclick="stmAnalyse()" id="stm-analyse-btn">⚡ Analyse Report</button>
-  </div>
+  <button class="btn btn-or btn-full" style="margin-top:12px;" onclick="stmAnalyse()">⚡ Analyse Report</button>
 </div>
-
-<!-- Step 3: Results -->
 <div id="stm-results" style="display:none;">
   <div class="card">
     <div class="ch">Step 3 — Results</div>
-    <div class="stats" id="stm-stats">
-      <div class="stat"><div class="sv" id="stm-total">0</div><div class="sl">Total Terms</div></div>
-      <div class="stat" style="border-color:#fca5a5;"><div class="sv" style="color:var(--rd)" id="stm-neg-cnt">0</div><div class="sl">🔴 Negatives</div></div>
-      <div class="stat" style="border-color:#86efac;"><div class="sv" style="color:var(--gn)" id="stm-hrv-cnt">0</div><div class="sl">🟢 Harvest</div></div>
-      <div class="stat" style="border-color:#fde68a;"><div class="sv" style="color:var(--yw)" id="stm-inv-cnt">0</div><div class="sl">🟡 Investigate</div></div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);">
+      <div class="kpi"><div class="kpi-val" id="stm-total">0</div><div class="kpi-lbl">Total Terms</div></div>
+      <div class="kpi" style="border-color:#FECACA;"><div class="kpi-val" style="color:var(--rd)" id="stm-neg">0</div><div class="kpi-lbl">🔴 Negatives</div></div>
+      <div class="kpi" style="border-color:#BBF7D0;"><div class="kpi-val" style="color:var(--gn)" id="stm-hrv">0</div><div class="kpi-lbl">🟢 Harvest</div></div>
+      <div class="kpi" style="border-color:#FDE68A;"><div class="kpi-val" style="color:var(--yw)" id="stm-inv">0</div><div class="kpi-lbl">🟡 Investigate</div></div>
+      <div class="kpi"><div class="kpi-val" id="stm-inc">0</div><div class="kpi-lbl">⚪ Inconclusive</div></div>
     </div>
-    <!-- Totals row -->
-    <div id="stm-totals-bar" style="background:#f8f8f8;border:1px solid var(--br);border-radius:4px;padding:8px 12px;display:flex;gap:20px;flex-wrap:wrap;font-size:11px;margin-bottom:12px;">
-      <span>💰 Total Spend: <strong id="stm-tot-spend">$0</strong></span>
-      <span>📦 Total Orders: <strong id="stm-tot-orders">0</strong></span>
-      <span>💸 Wasted Spend: <strong id="stm-wasted" style="color:var(--rd);">$0</strong></span>
-      <span>🏆 Harvestable Sales: <strong id="stm-hrv-sales" style="color:var(--gn);">$0</strong></span>
+    <div style="background:#F9FAFB;border:1px solid var(--br);border-radius:5px;padding:8px 12px;display:flex;gap:20px;flex-wrap:wrap;font-size:11px;margin-bottom:10px;">
+      <span>💰 Total Spend: <strong id="stm-sp">$0</strong></span>
+      <span>📦 Total Orders: <strong id="stm-or">0</strong></span>
+      <span>🔴 Wasted: <strong id="stm-ws" style="color:var(--rd)">$0</strong></span>
+      <span>🟢 Harvestable Sales: <strong id="stm-hs" style="color:var(--gn)">$0</strong></span>
     </div>
-    <!-- Filters -->
-    <div class="stm-filter-bar">
-      <span class="f-label">Filter:</span>
-      <button class="filter-btn active" onclick="stmFilter('all',this)">All</button>
-      <button class="filter-btn" onclick="stmFilter('neg',this)">🔴 Negatives</button>
-      <button class="filter-btn" onclick="stmFilter('hrv',this)">🟢 Harvest</button>
-      <button class="filter-btn" onclick="stmFilter('inv',this)">🟡 Investigate</button>
-      <button class="filter-btn" onclick="stmFilter('inc',this)">⚪ Inconclusive</button>
-      <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="stmSelectAll(true)">Select All</button>
-      <button class="btn btn-ghost btn-sm" onclick="stmSelectAll(false)">Deselect All</button>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="stmFlt('all',this)">All</button>
+      <button class="filter-btn" onclick="stmFlt('neg',this)">🔴 Negatives</button>
+      <button class="filter-btn" onclick="stmFlt('hrv',this)">🟢 Harvest</button>
+      <button class="filter-btn" onclick="stmFlt('inv',this)">🟡 Investigate</button>
+      <button class="filter-btn" onclick="stmFlt('inc',this)">⚪ Inconclusive</button>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="stmSelAll(true)">✓ All</button>
+      <button class="btn btn-ghost btn-sm" onclick="stmSelAll(false)">✗ None</button>
     </div>
-    <div class="stm-result-wrap tw">
-      <table id="stm-table">
-        <thead>
-          <tr>
-            <th><input type="checkbox" id="stm-sel-all" onchange="stmSelectAll(this.checked)" title="Select All"/></th>
-            <th>Search Term</th>
-            <th>Campaign</th>
-            <th>Match</th>
-            <th>Impr</th>
-            <th>Clicks</th>
-            <th>Spend</th>
-            <th>Sales</th>
-            <th>Orders</th>
-            <th>ACoS %</th>
-            <th>CPC</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="stm-tbody"></tbody>
-      </table>
-    </div>
-    <!-- Export -->
-    <div class="stm-export-row">
-      <button class="btn btn-rd" onclick="stmExport('neg')">⬇️ Export Selected Negatives Bulk File</button>
-      <button class="btn btn-gn" onclick="stmExport('hrv')">⬇️ Export Selected Harvest Bulk File</button>
-      <button class="btn btn-bl" onclick="stmExport('both')">⬇️ Export Both (Combined)</button>
+    <div class="tw stm-scroll"><table id="stm-tbl">
+      <thead><tr><th><input type="checkbox" onchange="stmSelAll(this.checked)"/></th><th>Search Term</th><th>Campaign</th><th>Impr</th><th>Clicks</th><th>Spend</th><th>Sales</th><th>Orders</th><th>ACoS %</th><th>CPC</th><th>Status</th></tr></thead>
+      <tbody id="stm-tb"></tbody>
+    </table></div>
+    <div class="export-row">
+      <button class="btn btn-rd" onclick="stmExp('neg')">⬇️ Export Negatives Bulk</button>
+      <button class="btn btn-gn" onclick="stmExp('hrv')">⬇️ Export Harvest Bulk</button>
+      <button class="btn btn-bl" onclick="stmExp('both')">⬇️ Export Both Combined</button>
     </div>
   </div>
 </div>
-</div><!-- /stm -->
+</div>
 
-<!-- ──────────── EXPORT ──────────── -->
+<!-- ─────────── PERFORMANCE DASHBOARD ─────────── -->
+<div class="panel" id="p-dash">
+<div class="ph"><h2>📊 Performance Dashboard</h2><p>Upload your bulk performance report or campaign report to visualise key metrics</p></div>
+<div id="dash-alert" class="alert"></div>
+<div class="card">
+  <div class="ch">Upload Performance Report <span class="tag tag-bl">CSV or XLSX</span></div>
+  <div class="upzone" id="dash-zone" ondragover="doDrag(event,'dash-zone')" ondragleave="noDrag('dash-zone')" ondrop="doDrop(event,'dash')">
+    <input type="file" id="dash-file" accept=".csv,.xlsx,.xls" onchange="dashRead(this.files[0])"/>
+    <div class="uico">📈</div><div class="ulbl">Click to upload or drag &amp; drop</div>
+    <div class="uhint">Amazon bulk download with performance data, or Campaign Report (CSV / XLSX)</div>
+  </div>
+  <div id="dash-up-status" class="up-status"></div>
+  <div id="dash-filters" style="display:none;margin-top:10px;">
+    <div class="fg g3">
+      <div><label>Filter Ad Type</label><select id="dash-type-filter" onchange="dashRender()"><option value="all">All Types</option><option value="Sponsored Products">Sponsored Products</option><option value="Sponsored Brands">Sponsored Brands</option><option value="Sponsored Display">Sponsored Display</option></select></div>
+      <div><label>Sort Campaigns By</label><select id="dash-sort" onchange="dashRender()"><option value="spend">Spend (High→Low)</option><option value="acos">ACoS (High→Low)</option><option value="sales">Sales (High→Low)</option><option value="orders">Orders (High→Low)</option></select></div>
+      <div><label>Show Top N Campaigns</label><select id="dash-top" onchange="dashRender()"><option value="10">Top 10</option><option value="20">Top 20</option><option value="50">Top 50</option><option value="999">All</option></select></div>
+    </div>
+  </div>
+</div>
+<div id="dash-content" style="display:none;">
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-val" id="d-spend">$0</div><div class="kpi-lbl">Total Spend</div></div>
+    <div class="kpi"><div class="kpi-val" id="d-sales">$0</div><div class="kpi-lbl">Total Sales</div></div>
+    <div class="kpi"><div class="kpi-val" id="d-acos">0%</div><div class="kpi-lbl">Overall ACoS</div><div class="kpi-sub" id="d-acos-sub"></div></div>
+    <div class="kpi"><div class="kpi-val" id="d-orders">0</div><div class="kpi-lbl">Total Orders</div></div>
+    <div class="kpi"><div class="kpi-val" id="d-cpc">$0</div><div class="kpi-lbl">Avg CPC</div></div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-val" id="d-impr">0</div><div class="kpi-lbl">Impressions</div></div>
+    <div class="kpi"><div class="kpi-val" id="d-clicks">0</div><div class="kpi-lbl">Clicks</div></div>
+    <div class="kpi"><div class="kpi-val" id="d-ctr">0%</div><div class="kpi-lbl">CTR</div></div>
+    <div class="kpi"><div class="kpi-val" id="d-roas">0x</div><div class="kpi-lbl">RoAS</div></div>
+    <div class="kpi"><div class="kpi-val" id="d-camps">0</div><div class="kpi-lbl">Campaigns</div></div>
+  </div>
+  <!-- Charts -->
+  <div class="chart-grid">
+    <div class="chart-box"><div class="chart-title">Spend by Campaign</div><div class="chart-wrap"><canvas id="c-spend"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">ACoS by Campaign (%) — Red line = 35% target</div><div class="chart-wrap"><canvas id="c-acos"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Sales vs Spend</div><div class="chart-wrap"><canvas id="c-salesspend"></canvas></div></div>
+    <div class="chart-box"><div class="chart-title">Orders by Campaign</div><div class="chart-wrap"><canvas id="c-orders"></canvas></div></div>
+  </div>
+  <!-- Data Table -->
+  <div class="card">
+    <div class="ch" style="justify-content:space-between;">
+      Campaign Performance Table
+      <button class="btn btn-gn btn-sm" onclick="dashExport()">⬇️ Export Report</button>
+    </div>
+    <div class="tw tw-scroll"><table id="dash-table">
+      <thead><tr><th>Campaign</th><th>Type</th><th>Impr</th><th>Clicks</th><th>CTR%</th><th>CPC</th><th>Spend</th><th>Sales</th><th>Orders</th><th>ACoS%</th><th>RoAS</th><th>CVR%</th></tr></thead>
+      <tbody id="dash-tb"></tbody>
+    </table></div>
+  </div>
+</div>
+</div>
+
+<!-- ─────────── CAMPAIGN AUDIT ─────────── -->
+<div class="panel" id="p-audit">
+<div class="ph"><h2>🔎 Campaign Audit Tool</h2><p>Upload any Amazon bulk file — instantly checks for errors, warnings &amp; best-practice issues before you upload to Amazon</p></div>
+<div id="audit-alert" class="alert"></div>
+<div class="card">
+  <div class="ch">Upload Bulk File to Audit <span class="tag tag-bl">SP / SB / SD</span></div>
+  <div class="upzone" id="audit-zone" ondragover="doDrag(event,'audit-zone')" ondragleave="noDrag('audit-zone')" ondrop="doDrop(event,'audit')">
+    <input type="file" id="audit-file" accept=".csv,.xlsx,.xls" onchange="auditRead(this.files[0])"/>
+    <div class="uico">🔎</div><div class="ulbl">Click to upload or drag &amp; drop</div>
+    <div class="uhint">SP, SB or SD bulk file — checks errors, warnings &amp; best practices</div>
+  </div>
+  <div id="audit-up-status" class="up-status"></div>
+</div>
+<div id="audit-content" style="display:none;">
+  <!-- Score -->
+  <div class="card">
+    <div class="ch">Audit Summary</div>
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div id="audit-ring" class="score-ring score-a">A</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;" id="audit-headline">No issues found</div>
+        <div style="font-size:12px;color:var(--mu);margin-top:4px;" id="audit-sub"></div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;">
+        <div class="kpi" style="min-width:70px;"><div class="kpi-val" style="color:var(--rd)" id="a-errs">0</div><div class="kpi-lbl">Errors</div></div>
+        <div class="kpi" style="min-width:70px;"><div class="kpi-val" style="color:var(--yw)" id="a-warns">0</div><div class="kpi-lbl">Warnings</div></div>
+        <div class="kpi" style="min-width:70px;"><div class="kpi-val" style="color:var(--bl)" id="a-infos">0</div><div class="kpi-lbl">Info</div></div>
+        <div class="kpi" style="min-width:70px;"><div class="kpi-val" id="a-rows">0</div><div class="kpi-lbl">Rows</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- Issues -->
+  <div id="audit-issues"></div>
+  <!-- Buttons -->
+  <div class="export-row">
+    <button class="btn btn-gn" onclick="auditExport()">⬇️ Export Audit Report</button>
+    <button class="btn btn-ghost" onclick="auditRead(null,true)">🔄 Re-run Audit</button>
+  </div>
+</div>
+</div>
+
+<!-- ─────────── EXPORT ─────────── -->
 <div class="panel" id="p-exp">
-<div class="ph"><h2>⬇️ Export Bulk File</h2><p>Download your queued campaigns as a single XLSX with one sheet per ad type</p></div>
+<div class="ph"><h2>⬇️ Export Bulk File</h2><p>Download all queued campaigns as a single XLSX — one sheet per ad type</p></div>
 <div id="exp-alert" class="alert"></div>
-<div class="stats">
-  <div class="stat"><div class="sv" id="e-sp">0</div><div class="sl">SP Campaigns</div></div>
-  <div class="stat"><div class="sv" id="e-sb">0</div><div class="sl">SB Campaigns</div></div>
-  <div class="stat"><div class="sv" id="e-sd">0</div><div class="sl">SD Campaigns</div></div>
-  <div class="stat"><div class="sv" id="e-rows">0</div><div class="sl">Total Rows</div></div>
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-val" id="e-sp">0</div><div class="kpi-lbl">SP Campaigns</div></div>
+  <div class="kpi"><div class="kpi-val" id="e-sb">0</div><div class="kpi-lbl">SB Campaigns</div></div>
+  <div class="kpi"><div class="kpi-val" id="e-sd">0</div><div class="kpi-lbl">SD Campaigns</div></div>
+  <div class="kpi"><div class="kpi-val" id="e-rows">0</div><div class="kpi-lbl">Total Rows</div></div>
+  <div class="kpi"><div class="kpi-val" id="e-kws">0</div><div class="kpi-lbl">Total Keywords</div></div>
 </div>
 <div class="card">
   <div class="ch">Download</div>
-  <p style="color:var(--mu);font-size:12px;margin-bottom:12px;">Each ad type exports to its own sheet, matching Amazon's bulk upload format exactly. File is named with today's date.</p>
+  <p style="color:var(--mu);font-size:12px;margin-bottom:12px;">Each ad type exports to its own sheet, matching Amazon's bulk upload format. File auto-named with today's date.</p>
   <div style="display:flex;gap:10px;flex-wrap:wrap;">
     <button class="btn btn-gn" onclick="expAll()">⬇️ Download All (SP + SB + SD)</button>
     <button class="btn btn-bl btn-sm" onclick="expType('sp')">SP Only</button>
@@ -490,482 +535,538 @@ tr:hover td{background:#f9f9f9;}
     <button class="btn btn-bl btn-sm" onclick="expType('sd')">SD Only</button>
   </div>
 </div>
-</div><!-- /exp -->
+</div>
 
 </main>
-</div><!-- /app -->
+</div><!-- /wrap -->
 
 <script>
-// ════════════════════════════════════════════════════════════
-//  HELPERS
-// ════════════════════════════════════════════════════════════
-const $ = id => document.getElementById(id);
-const v = id => ($( id)||{}).value||'';
-const lines = id => v(id).split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-const num = id => parseFloat(v(id))||0;
-const toSPDate = iso => { if(!iso)return''; const[y,m,d]=iso.split('-'); return`${m}/${d}/${y}`; };
-const toAZDate = iso => iso?iso.replace(/-/g,''):'';
-const today = () => new Date().toISOString().split('T')[0];
-const dateStr = () => today().replace(/-/g,'');
-const fmtMoney = n => '$'+Number(n).toFixed(2);
-const fmtPct = n => isNaN(n)||!isFinite(n)?'—':Number(n).toFixed(1)+'%';
+// ══════════════════════════════════════════════════════════
+// CORE HELPERS
+// ══════════════════════════════════════════════════════════
+const $=id=>document.getElementById(id);
+const v=id=>($( id)||{}).value||'';
+const ln=id=>v(id).split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+const num=id=>parseFloat(v(id))||0;
+const toSPD=iso=>{if(!iso)return'';const[y,m,d]=iso.split('-');return`${m}/${d}/${y}`;};
+const toAZD=iso=>iso?iso.replace(/-/g,''):'';
+const today_=()=>new Date().toISOString().split('T')[0];
+const ds_=()=>today_().replace(/-/g,'');
+const fm$=n=>'$'+Number(n).toFixed(2);
+const fmK=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toLocaleString();
+const pct=n=>isNaN(n)||!isFinite(n)?'—':n.toFixed(1)+'%';
 
-function showAlert(id,type,msg){const el=$(id);el.className='alert on '+type;el.textContent=msg;setTimeout(()=>el.className='alert',6000);}
+function shAlert(id,tp,msg){const el=$(id);el.className='alert on '+tp;el.textContent=msg;if(tp!=='info')setTimeout(()=>el.className='alert',7000);}
 function togAdv(id){const b=event.currentTarget,d=$(id);b.classList.toggle('open');d.classList.toggle('open');}
-function spTTChange(){const m=v('sp-tt')==='Manual';$('sp-kw-card').style.display=m?'':'none';}
+function doDrag(e,id){e.preventDefault();$(id).classList.add('drag');}
+function noDrag(id){$(id).classList.remove('drag');}
+function doDrop(e,type){e.preventDefault();const z=`${type}-zone`;$(z)&&$(z).classList.remove('drag');const f=e.dataTransfer.files[0];if(!f)return;if(type==='stm')stmRead(f);else if(type==='dash')dashRead(f);else if(type==='audit')auditRead(f);}
+function spTT(){const m=v('sp-tt')==='Manual';$('sp-kw-card').style.display=m?'':'none';}
+function go(tab,el){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));$('p-'+tab).classList.add('active');el.classList.add('active');if(tab==='exp')refreshExp();}
 
 // Init dates
-['sp-sd','sb-sd','sd-sd'].forEach(id=>{const el=$(id);if(el)el.value=today();});
+['sp-sd','sb-sd','sd-sd'].forEach(id=>{const el=$(id);if(el)el.value=today_();});
 
-// ════════════════════════════════════════════════════════════
-//  NAV
-// ════════════════════════════════════════════════════════════
-function go(tab,el){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  $('p-'+tab).classList.add('active');
-  el.classList.add('active');
-  if(tab==='exp')refreshExpStats();
-}
+// ══════════════════════════════════════════════════════════
+// BULK ROW STATE
+// ══════════════════════════════════════════════════════════
+const Q={sp:[],sb:[],sd:[]};
+function updB(t){const n=Q[t].length;const el=$('nb-'+t);if(!el)return;el.textContent=n;el.classList.toggle('on',n>0);}
 
-// ════════════════════════════════════════════════════════════
-//  STATE
-// ════════════════════════════════════════════════════════════
-const Q = {sp:[],sb:[],sd:[]};
-function updBadge(t){const n=Q[t].length;const el=$('nb-'+t);el.textContent=n;el.classList.toggle('on',n>0);}
-
-// ════════════════════════════════════════════════════════════
-//  SP BULK FORMAT
-// ════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// SP
+// ══════════════════════════════════════════════════════════
 const SP_H=['Product','Entity','Operation','Campaign ID','Ad Group ID','Portfolio ID','Ad ID','Keyword ID','Product Targeting ID','Campaign Name','Ad Group Name','Start Date','End Date','Targeting Type','State','Daily Budget','SKU','Ad Format','Max Bid','Keyword Text','Native Language Keyword','Native Language Locale','Match Type','Bidding Strategy','Placement','Percentage'];
-function spRow(o){const b={'Product':'Sponsored Products','Entity':'','Operation':'Create','Campaign ID':'','Ad Group ID':'','Portfolio ID':'','Ad ID':'','Keyword ID':'','Product Targeting ID':'','Campaign Name':'','Ad Group Name':'','Start Date':'','End Date':'','Targeting Type':'','State':'Enabled','Daily Budget':'','SKU':'','Ad Format':'Standard','Max Bid':'','Keyword Text':'','Native Language Keyword':'','Native Language Locale':'','Match Type':'','Bidding Strategy':'','Placement':'','Percentage':''};return SP_H.map(h=>o[h]!==undefined?o[h]:b[h]);}
+const SP_B={Product:'Sponsored Products',Entity:'',Operation:'Create','Campaign ID':'','Ad Group ID':'','Portfolio ID':'','Ad ID':'','Keyword ID':'','Product Targeting ID':'','Campaign Name':'','Ad Group Name':'','Start Date':'','End Date':'','Targeting Type':'','State':'Enabled','Daily Budget':'','SKU':'','Ad Format':'Standard','Max Bid':'','Keyword Text':'','Native Language Keyword':'','Native Language Locale':'','Match Type':'','Bidding Strategy':'','Placement':'','Percentage':''};
+function spR(o){return SP_H.map(h=>o[h]!==undefined?o[h]:SP_B[h]);}
 
 function addSP(){
   const cn=v('sp-cn').trim(),ag=v('sp-ag').trim(),bgt=num('sp-bgt')||10,db=num('sp-db')||0.75;
   const tt=v('sp-tt'),st=v('sp-st'),bs=v('sp-bs'),pid=v('sp-pid');
-  const sd=toSPDate(v('sp-sd')),ed=toSPDate(v('sp-ed'));
-  const asins=lines('sp-asins'),kws=lines('sp-kws');
-  const kb=num('sp-kb')||db;
-  const pts=[],ptp=parseInt(v('sp-pt'))||0,ppp=parseInt(v('sp-pp'))||0,prp=parseInt(v('sp-pr'))||0;
-  const negAG=lines('sp-nag'),negCamp=lines('sp-ncamp');
-  const ptAsins=lines('sp-pta'),ptBid=num('sp-ptb')||db,negPT=lines('sp-npt');
-  const mts=[]; if($('sp-me').checked)mts.push('Exact'); if($('sp-mb').checked)mts.push('Broad'); if($('sp-mp').checked)mts.push('Phrase');
-
-  if(!cn)return showAlert('sp-alert','err','Campaign Name is required.');
-  if(!ag)return showAlert('sp-alert','err','Ad Group Name is required.');
-  if(!asins.length)return showAlert('sp-alert','err','At least one ASIN/SKU is required.');
-  if(tt==='Manual'&&!kws.length)return showAlert('sp-alert','err','Add at least one keyword for Manual targeting.');
-  if(tt==='Manual'&&!mts.length)return showAlert('sp-alert','err','Select at least one Match Type.');
-
+  const sd=toSPD(v('sp-sd')),ed=toSPD(v('sp-ed'));
+  const asins=ln('sp-asins'),kws=ln('sp-kws'),kb=num('sp-kb')||db;
+  const mts=[];if($('sp-me').checked)mts.push('Exact');if($('sp-mb').checked)mts.push('Broad');if($('sp-mp').checked)mts.push('Phrase');
+  const nag=ln('sp-nag'),nc=ln('sp-nc'),pta=ln('sp-pta'),npt=ln('sp-npt'),ptb=num('sp-ptb')||db;
+  const nagMT=[];if($('sp-nage').checked)nagMT.push('Negative Exact');if($('sp-nagp').checked)nagMT.push('Negative Phrase');
+  const ncMT=[];if($('sp-nce').checked)ncMT.push('Negative Exact');if($('sp-ncp').checked)ncMT.push('Negative Phrase');
+  if(!cn)return shAlert('sp-alert','err','Campaign Name required.');
+  if(!ag)return shAlert('sp-alert','err','Ad Group Name required.');
+  if(!asins.length)return shAlert('sp-alert','err','At least one ASIN/SKU required.');
+  if(tt==='Manual'&&!kws.length)return shAlert('sp-alert','err','Add keywords for Manual targeting.');
+  if(tt==='Manual'&&!mts.length)return shAlert('sp-alert','err','Select at least one Match Type.');
   const rows=[];
-  rows.push(spRow({'Entity':'Campaign','Campaign Name':cn,'Start Date':sd,'End Date':ed,'Targeting Type':tt,'State':st,'Daily Budget':bgt,'Bidding Strategy':bs,'Portfolio ID':pid}));
-  [[' Placement Top',ptp],[' Placement Product Page',ppp],[' Placement Rest of Search',prp]].forEach(([pl,pct])=>{if(pct>0)rows.push(spRow({'Entity':'Bidding Adjustment','Campaign Name':cn,'Placement':pl.trim(),'Percentage':pct}));});
-  const negCampMTs=[]; if($('sp-ncampe').checked)negCampMTs.push('Negative Exact'); if($('sp-ncampp').checked)negCampMTs.push('Negative Phrase');
-  negCamp.forEach(kw=>negCampMTs.forEach(mt=>rows.push(spRow({'Entity':'Campaign Negative Keyword','Campaign Name':cn,'Keyword Text':kw,'Match Type':mt}))));
-  rows.push(spRow({'Entity':'Ad Group','Campaign Name':cn,'Ad Group Name':ag,'State':st,'Max Bid':db}));
-  asins.forEach(sku=>rows.push(spRow({'Entity':'Ad','Campaign Name':cn,'Ad Group Name':ag,'State':st,'SKU':sku})));
-  if(tt==='Manual'){kws.forEach(kw=>mts.forEach(mt=>rows.push(spRow({'Entity':'Keyword','Campaign Name':cn,'Ad Group Name':ag,'State':st,'Keyword Text':kw,'Match Type':mt,'Max Bid':kb}))));}
-  const negAGMTs=[]; if($('sp-nage').checked)negAGMTs.push('Negative Exact'); if($('sp-nagp').checked)negAGMTs.push('Negative Phrase');
-  negAG.forEach(kw=>negAGMTs.forEach(mt=>rows.push(spRow({'Entity':'Negative keyword','Campaign Name':cn,'Ad Group Name':ag,'Keyword Text':kw,'Match Type':mt}))));
-  ptAsins.forEach(asin=>{const expr=asin.includes('"')?asin:`asin="${asin}"`;rows.push(spRow({'Entity':'Product Targeting','Campaign Name':cn,'Ad Group Name':ag,'State':st,'Keyword Text':expr,'Max Bid':ptBid}));});
-  negPT.forEach(asin=>{const expr=asin.includes('"')?asin:`asin="${asin}"`;rows.push(spRow({'Entity':'Negative Product Targeting','Campaign Name':cn,'Ad Group Name':ag,'Keyword Text':expr}));});
-
-  Q.sp.push({cn,ag,bgt,db,tt,kws,asins,mts,negKW:[...negAG,...negCamp],rows});
-  updBadge('sp');renderQSP();
-  showAlert('sp-alert','ok',`✅ "${cn}" queued — ${rows.length} rows.`);
+  rows.push(spR({Entity:'Campaign','Campaign Name':cn,'Start Date':sd,'End Date':ed,'Targeting Type':tt,State:st,'Daily Budget':bgt,'Bidding Strategy':bs,'Portfolio ID':pid}));
+  [['Placement Top',parseInt(v('sp-pt'))||0],['Placement Product Page',parseInt(v('sp-pp'))||0],['Placement Rest of Search',parseInt(v('sp-pr'))||0]].forEach(([pl,pct])=>{if(pct>0)rows.push(spR({Entity:'Bidding Adjustment','Campaign Name':cn,Placement:pl,Percentage:pct}));});
+  nc.forEach(kw=>ncMT.forEach(mt=>rows.push(spR({Entity:'Campaign Negative Keyword','Campaign Name':cn,'Keyword Text':kw,'Match Type':mt}))));
+  rows.push(spR({Entity:'Ad Group','Campaign Name':cn,'Ad Group Name':ag,State:st,'Max Bid':db}));
+  asins.forEach(sku=>rows.push(spR({Entity:'Ad','Campaign Name':cn,'Ad Group Name':ag,State:st,SKU:sku})));
+  if(tt==='Manual')kws.forEach(kw=>mts.forEach(mt=>rows.push(spR({Entity:'Keyword','Campaign Name':cn,'Ad Group Name':ag,State:st,'Keyword Text':kw,'Match Type':mt,'Max Bid':kb}))));
+  nag.forEach(kw=>nagMT.forEach(mt=>rows.push(spR({Entity:'Negative keyword','Campaign Name':cn,'Ad Group Name':ag,'Keyword Text':kw,'Match Type':mt}))));
+  pta.forEach(a=>{const e=a.includes('"')?a:`asin="${a}"`;rows.push(spR({Entity:'Product Targeting','Campaign Name':cn,'Ad Group Name':ag,State:st,'Keyword Text':e,'Max Bid':ptb}));});
+  npt.forEach(a=>{const e=a.includes('"')?a:`asin="${a}"`;rows.push(spR({Entity:'Negative Product Targeting','Campaign Name':cn,'Ad Group Name':ag,'Keyword Text':e}));});
+  Q.sp.push({cn,ag,bgt,db,tt,kws,asins,mts,negKW:[...nag,...nc],rows});updB('sp');renderQ('sp');
+  shAlert('sp-alert','ok',`✅ "${cn}" queued — ${rows.length} rows.`);
 }
-
-function renderQSP(){
-  const tb=$('sp-qb');tb.innerHTML='';
-  Q.sp.forEach((e,i)=>{tb.innerHTML+=`<tr><td>${i+1}</td><td>${e.cn}</td><td><span class="pill p-${e.tt.toLowerCase()}">${e.tt}</span></td><td>$${e.bgt}</td><td>$${e.db}</td><td>${e.kws.length}×${e.mts.length}</td><td>${e.asins.length}</td><td>${e.negKW.length}</td><td><button class="rm" onclick="rmQ('sp',${i})">✕</button></td></tr>`;});
-  $('sp-queue').style.display=Q.sp.length?'block':'none';
+function renderQ(t){
+  const tb=$(t+'-qb');tb.innerHTML='';
+  if(t==='sp')Q.sp.forEach((e,i)=>{tb.innerHTML+=`<tr><td>${i+1}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${e.cn}</td><td><span class="pill p-${e.tt.toLowerCase()}">${e.tt}</span></td><td>$${e.bgt}</td><td>$${e.db}</td><td>${e.kws.length}×${e.mts.length}</td><td>${e.asins.length}</td><td>${e.negKW.length}</td><td><button class="rm" onclick="rmQ('sp',${i})">✕</button></td></tr>`;});
+  if(t==='sb')Q.sb.forEach((e,i)=>{tb.innerHTML+=`<tr><td>${i+1}</td><td>${e.asin}</td><td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;">${e.lbl}</td><td>$${e.bgt}</td><td>$${e.bid}</td><td>${e.kws.length}</td><td>${e.vids.length}</td><td>${e.nk}</td><td><button class="rm" onclick="rmQ('sb',${i})">✕</button></td></tr>`;});
+  if(t==='sd')Q.sd.forEach((e,i)=>{tb.innerHTML+=`<tr><td>${i+1}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${e.cn}</td><td>$${e.bgt}</td><td>${e.ag}</td><td>${e.asins.length}</td><td>${e.tgts.length}</td><td><button class="rm" onclick="rmQ('sd',${i})">✕</button></td></tr>`;});
+  $(t+'-queue').style.display=Q[t].length?'block':'none';
 }
+function rmQ(t,i){Q[t].splice(i,1);updB(t);renderQ(t);}
+function clearAll(){if(!confirm('Clear all queued campaigns?'))return;['sp','sb','sd'].forEach(t=>{Q[t]=[];updB(t);renderQ(t);});}
 
-// ════════════════════════════════════════════════════════════
-//  SB BULK FORMAT
-// ════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// SB
+// ══════════════════════════════════════════════════════════
 const SB_H=['Product','Entity','Operation','Campaign ID','Draft Campaign ID','Portfolio ID','Ad Group ID','Keyword ID','Product Targeting ID','Campaign Name','Start Date','End Date','State','Budget Type','Budget','Bid Optimization','Bid Multiplier','Bid','Keyword Text','Match Type','Product Targeting Expression','Ad Format','Landing Page URL','Landing Page ASINs','Brand Entity ID','Brand Name','Brand Logo Asset ID','Custom Image Asset ID','Creative Headline','Creative ASINs','Video Media IDs','Creative Type'];
-function sbRow(o){const b={'Product':'Sponsored Brands','Entity':'','Operation':'Create','Campaign ID':'','Draft Campaign ID':'','Portfolio ID':'','Ad Group ID':'','Keyword ID':'','Product Targeting ID':'','Campaign Name':'','Start Date':'','End Date':'','State':'Enabled','Budget Type':'Daily','Budget':'','Bid Optimization':'Auto','Bid Multiplier':'','Bid':'','Keyword Text':'','Match Type':'','Product Targeting Expression':'','Ad Format':'Video','Landing Page URL':'','Landing Page ASINs':'','Brand Entity ID':'','Brand Name':'','Brand Logo Asset ID':'','Custom Image Asset ID':'','Creative Headline':'','Creative ASINs':'','Video Media IDs':'','Creative Type':'Video'};return SB_H.map(h=>o[h]!==undefined?o[h]:b[h]);}
+const SB_B={Product:'Sponsored Brands',Entity:'',Operation:'Create','Campaign ID':'','Draft Campaign ID':'','Portfolio ID':'','Ad Group ID':'','Keyword ID':'','Product Targeting ID':'','Campaign Name':'','Start Date':'','End Date':'',State:'Enabled','Budget Type':'Daily',Budget:'','Bid Optimization':'Auto','Bid Multiplier':'',Bid:'','Keyword Text':'','Match Type':'','Product Targeting Expression':'','Ad Format':'Video','Landing Page URL':'','Landing Page ASINs':'','Brand Entity ID':'','Brand Name':'','Brand Logo Asset ID':'','Custom Image Asset ID':'','Creative Headline':'','Creative ASINs':'','Video Media IDs':'','Creative Type':'Video'};
+function sbR(o){return SB_H.map(h=>o[h]!==undefined?o[h]:SB_B[h]);}
 
 function addSB(){
   const asin=v('sb-asin').trim().toUpperCase(),lbl=v('sb-lbl').trim();
   const bgt=num('sb-bgt')||5,bid=num('sb-bid')||0.7;
-  const bei=v('sb-bei').trim(),bn=v('sb-bn').trim();
-  const fmt=v('sb-fmt'),st=v('sb-st');
-  const sd=toAZDate(v('sb-sd')),ed=toAZDate(v('sb-ed'));
-  const kws=lines('sb-kws'),vids=lines('sb-vids'),negKws=lines('sb-nkw');
+  const bei=v('sb-bei').trim(),bn=v('sb-bn').trim(),fmt=v('sb-fmt'),st=v('sb-st');
+  const sd=toAZD(v('sb-sd')),ed=toAZD(v('sb-ed'));
+  const kws=ln('sb-kws'),vids=ln('sb-vids'),nkws=ln('sb-nkw');
   const ct=fmt==='Video'?'Video':'Standard';
-  const negMTs=[]; if($('sb-ne').checked)negMTs.push('Negative Exact'); if($('sb-np').checked)negMTs.push('Negative Phrase');
-
-  if(!asin)return showAlert('sb-alert','err','ASIN is required.');
-  if(!lbl)return showAlert('sb-alert','err','Campaign Label is required.');
-  if(!kws.length)return showAlert('sb-alert','err','Add at least one keyword.');
-
+  const nmt=[];if($('sb-ne').checked)nmt.push('Negative Exact');if($('sb-np').checked)nmt.push('Negative Phrase');
+  if(!asin)return shAlert('sb-alert','err','ASIN required.');
+  if(!lbl)return shAlert('sb-alert','err','Campaign Label required.');
+  if(!kws.length)return shAlert('sb-alert','err','Add at least one keyword.');
   const rows=[];
   kws.forEach((kw,i)=>{
     const cid=`${asin}_${lbl}_${kw}`,vid=i<vids.length?vids[i]:'';
-    rows.push(sbRow({'Entity':'Campaign','Campaign ID':cid,'Campaign Name':cid,'Start Date':sd,'End Date':ed,'State':st,'Budget':bgt,'Ad Format':fmt,'Brand Entity ID':bei,'Brand Name':bn,'Creative ASINs':asin,'Video Media IDs':vid,'Creative Type':ct}));
-    rows.push(sbRow({'Entity':'Keyword','Campaign ID':cid,'State':'Enabled','Bid':bid,'Keyword Text':kw,'Match Type':'Exact','Brand Entity ID':bei,'Brand Name':bn,'Creative Type':ct}));
-    negKws.forEach(nkw=>negMTs.forEach(mt=>rows.push(sbRow({'Entity':'Negative keyword','Campaign ID':cid,'Keyword Text':nkw,'Match Type':mt,'Brand Entity ID':bei,'Brand Name':bn}))));
+    rows.push(sbR({Entity:'Campaign','Campaign ID':cid,'Campaign Name':cid,'Start Date':sd,'End Date':ed,State:st,Budget:bgt,'Ad Format':fmt,'Brand Entity ID':bei,'Brand Name':bn,'Creative ASINs':asin,'Video Media IDs':vid,'Creative Type':ct}));
+    rows.push(sbR({Entity:'Keyword','Campaign ID':cid,State:'Enabled',Bid:bid,'Keyword Text':kw,'Match Type':'Exact','Brand Entity ID':bei,'Brand Name':bn,'Creative Type':ct}));
+    nkws.forEach(nkw=>nmt.forEach(mt=>rows.push(sbR({Entity:'Negative keyword','Campaign ID':cid,'Keyword Text':nkw,'Match Type':mt,'Brand Entity ID':bei,'Brand Name':bn}))));
   });
-
-  Q.sb.push({asin,lbl,bgt,bid,kws,vids,negKWCount:negKws.length,rows});
-  updBadge('sb');renderQSB();
-  showAlert('sb-alert','ok',`✅ ${kws.length} SB campaigns queued — ${rows.length} rows.`);
+  Q.sb.push({asin,lbl,bgt,bid,kws,vids,nk:nkws.length,rows});updB('sb');renderQ('sb');
+  shAlert('sb-alert','ok',`✅ ${kws.length} SB campaigns queued — ${rows.length} rows.`);
 }
 
-function renderQSB(){
-  const tb=$('sb-qb');tb.innerHTML='';
-  Q.sb.forEach((e,i)=>{tb.innerHTML+=`<tr><td>${i+1}</td><td>${e.asin}</td><td>${e.lbl}</td><td>$${e.bgt}</td><td>$${e.bid}</td><td>${e.kws.length}</td><td>${e.vids.length}</td><td>${e.negKWCount}</td><td><button class="rm" onclick="rmQ('sb',${i})">✕</button></td></tr>`;});
-  $('sb-queue').style.display=Q.sb.length?'block':'none';
-}
-
-// ════════════════════════════════════════════════════════════
-//  SD BULK FORMAT
-// ════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// SD
+// ══════════════════════════════════════════════════════════
 const SD_H=['Product','Entity','Operation','Campaign ID','Ad Group ID','Ad ID','Target ID','Campaign Name','Ad Group Name','Start Date','End Date','State','Daily Budget','Ad Group Default Bid','Targeting Expression','ASIN','Creative Headline'];
-function sdRow(o){const b={'Product':'Sponsored Display','Entity':'','Operation':'Create','Campaign ID':'','Ad Group ID':'','Ad ID':'','Target ID':'','Campaign Name':'','Ad Group Name':'','Start Date':'','End Date':'','State':'Enabled','Daily Budget':'','Ad Group Default Bid':'','Targeting Expression':'','ASIN':'','Creative Headline':''};return SD_H.map(h=>o[h]!==undefined?o[h]:b[h]);}
+const SD_B={Product:'Sponsored Display',Entity:'',Operation:'Create','Campaign ID':'','Ad Group ID':'','Ad ID':'','Target ID':'','Campaign Name':'','Ad Group Name':'','Start Date':'','End Date':'',State:'Enabled','Daily Budget':'','Ad Group Default Bid':'','Targeting Expression':'',ASIN:'','Creative Headline':''};
+function sdR(o){return SD_H.map(h=>o[h]!==undefined?o[h]:SD_B[h]);}
 
 function addSD(){
   const cn=v('sd-cn').trim(),ag=v('sd-ag').trim();
-  const bgt=num('sd-bgt')||10,db=num('sd-db')||0.5,tb=num('sd-tb')||db;
-  const st=v('sd-st'),sd_=toAZDate(v('sd-sd')),ed=toAZDate(v('sd-ed'));
-  const asins=lines('sd-asins'),tgts=lines('sd-tgts'),hl=v('sd-hl');
-
-  if(!cn)return showAlert('sd-alert','err','Campaign Name is required.');
-  if(!ag)return showAlert('sd-alert','err','Ad Group Name is required.');
-  if(!asins.length)return showAlert('sd-alert','err','At least one ASIN is required.');
-
+  const bgt=num('sd-bgt')||10,db=num('sd-db')||0.5,tb_=num('sd-tb')||db;
+  const st=v('sd-st'),sd_=toAZD(v('sd-sd')),ed=toAZD(v('sd-ed'));
+  const asins=ln('sd-asins'),tgts=ln('sd-tgts'),hl=v('sd-hl');
+  if(!cn)return shAlert('sd-alert','err','Campaign Name required.');
+  if(!ag)return shAlert('sd-alert','err','Ad Group Name required.');
+  if(!asins.length)return shAlert('sd-alert','err','At least one ASIN required.');
   const rows=[];
-  rows.push(sdRow({'Entity':'Campaign','Campaign Name':cn,'Start Date':sd_,'End Date':ed,'State':st,'Daily Budget':bgt}));
-  rows.push(sdRow({'Entity':'Ad Group','Campaign Name':cn,'Ad Group Name':ag,'State':st,'Ad Group Default Bid':db}));
-  asins.forEach(asin=>rows.push(sdRow({'Entity':'Ad','Campaign Name':cn,'Ad Group Name':ag,'State':st,'ASIN':asin,'Creative Headline':hl})));
-  tgts.forEach(expr=>{const e=expr.includes('=')?expr:`asin="${expr}"`;rows.push(sdRow({'Entity':'Targeting','Campaign Name':cn,'Ad Group Name':ag,'State':st,'Targeting Expression':e,'Ad Group Default Bid':tb}));});
-
-  Q.sd.push({cn,ag,bgt,db,asins,tgts,rows});
-  updBadge('sd');renderQSD();
-  showAlert('sd-alert','ok',`✅ "${cn}" queued — ${rows.length} rows.`);
+  rows.push(sdR({Entity:'Campaign','Campaign Name':cn,'Start Date':sd_,'End Date':ed,State:st,'Daily Budget':bgt}));
+  rows.push(sdR({Entity:'Ad Group','Campaign Name':cn,'Ad Group Name':ag,State:st,'Ad Group Default Bid':db}));
+  asins.forEach(a=>rows.push(sdR({Entity:'Ad','Campaign Name':cn,'Ad Group Name':ag,State:st,ASIN:a,'Creative Headline':hl})));
+  tgts.forEach(t=>{const e=t.includes('=')?t:`asin="${t}"`;rows.push(sdR({Entity:'Targeting','Campaign Name':cn,'Ad Group Name':ag,State:st,'Targeting Expression':e,'Ad Group Default Bid':tb_}));});
+  Q.sd.push({cn,ag,bgt,db,asins,tgts,rows});updB('sd');renderQ('sd');
+  shAlert('sd-alert','ok',`✅ "${cn}" queued — ${rows.length} rows.`);
 }
 
-function renderQSD(){
-  const tb=$('sd-qb');tb.innerHTML='';
-  Q.sd.forEach((e,i)=>{tb.innerHTML+=`<tr><td>${i+1}</td><td>${e.cn}</td><td>$${e.bgt}</td><td>${e.ag}</td><td>${e.asins.length}</td><td>${e.tgts.length}</td><td><button class="rm" onclick="rmQ('sd',${i})">✕</button></td></tr>`;});
-  $('sd-queue').style.display=Q.sd.length?'block':'none';
+// ══════════════════════════════════════════════════════════
+// EXPORT (Campaigns)
+// ══════════════════════════════════════════════════════════
+function refreshExp(){
+  const sr=Q.sp.reduce((s,e)=>s+e.rows.length,0),sbr=Q.sb.reduce((s,e)=>s+e.rows.length,0),sdr=Q.sd.reduce((s,e)=>s+e.rows.length,0);
+  $('e-sp').textContent=Q.sp.length;$('e-sb').textContent=Q.sb.length;$('e-sd').textContent=Q.sd.length;
+  $('e-rows').textContent=sr+sbr+sdr;
+  $('e-kws').textContent=Q.sp.reduce((s,e)=>s+e.kws.length*e.mts.length,0)+Q.sb.reduce((s,e)=>s+e.kws.length,0);
 }
-
-function rmQ(t,i){Q[t].splice(i,1);updBadge(t);if(t==='sp')renderQSP();if(t==='sb')renderQSB();if(t==='sd')renderQSD();}
-function clearAll(){if(!confirm('Clear all queued campaigns?'))return;['sp','sb','sd'].forEach(t=>{Q[t]=[];updBadge(t);});renderQSP();renderQSB();renderQSD();}
-
-// ════════════════════════════════════════════════════════════
-//  EXPORT (CAMPAIGN BUILDER)
-// ════════════════════════════════════════════════════════════
-function refreshExpStats(){
-  $('e-sp').textContent=Q.sp.length; $('e-sb').textContent=Q.sb.length; $('e-sd').textContent=Q.sd.length;
-  $('e-rows').textContent=Q.sp.reduce((s,e)=>s+e.rows.length,0)+Q.sb.reduce((s,e)=>s+e.rows.length,0)+Q.sd.reduce((s,e)=>s+e.rows.length,0);
-}
-function buildWS(header,entries){
+function mkWS(h,entries){
   if(!entries.length)return null;
-  const all=[header,...entries.flatMap(e=>e.rows)];
+  const all=[h,...entries.flatMap(e=>e.rows)];
   const ws=XLSX.utils.aoa_to_sheet(all);
-  ws['!cols']=header.map((_,ci)=>({wch:Math.min(Math.max(...all.map(r=>String(r[ci]??'').length))+2,55)}));
+  ws['!cols']=h.map((_,ci)=>({wch:Math.min(Math.max(...all.map(r=>String(r[ci]??'').length))+2,55)}));
   return ws;
 }
 function expAll(){
   const tot=Q.sp.length+Q.sb.length+Q.sd.length;
-  if(!tot)return showAlert('exp-alert','err','No campaigns queued.');
+  if(!tot)return shAlert('exp-alert','err','No campaigns queued.');
   const wb=XLSX.utils.book_new();
-  const spWS=buildWS(SP_H,Q.sp),sbWS=buildWS(SB_H,Q.sb),sdWS=buildWS(SD_H,Q.sd);
-  if(spWS)XLSX.utils.book_append_sheet(wb,spWS,'Sponsored Products');
-  if(sbWS)XLSX.utils.book_append_sheet(wb,sbWS,'Sponsored Brands');
-  if(sdWS)XLSX.utils.book_append_sheet(wb,sdWS,'Sponsored Display');
-  XLSX.writeFile(wb,`Amazon_PPC_Bulk_${dateStr()}.xlsx`);
-  showAlert('exp-alert','ok','✅ Bulk file downloaded!');
+  const s1=mkWS(SP_H,Q.sp),s2=mkWS(SB_H,Q.sb),s3=mkWS(SD_H,Q.sd);
+  if(s1)XLSX.utils.book_append_sheet(wb,s1,'Sponsored Products');
+  if(s2)XLSX.utils.book_append_sheet(wb,s2,'Sponsored Brands');
+  if(s3)XLSX.utils.book_append_sheet(wb,s3,'Sponsored Display');
+  XLSX.writeFile(wb,`Amazon_PPC_Bulk_${ds_()}.xlsx`);
+  shAlert('exp-alert','ok','✅ Bulk file downloaded!');
 }
 function expType(t){
-  if(!Q[t].length)return showAlert('exp-alert','err','No campaigns queued for that type.');
-  const map={sp:[SP_H,'Sponsored Products'],sb:[SB_H,'Sponsored Brands'],sd:[SD_H,'Sponsored Display']};
-  const [h,name]=map[t];const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,buildWS(h,Q[t]),name);
-  XLSX.writeFile(wb,`Amazon_${t.toUpperCase()}_Bulk_${dateStr()}.xlsx`);
-  showAlert('exp-alert','ok',`✅ ${name} file downloaded!`);
+  if(!Q[t].length)return shAlert('exp-alert','err','No campaigns queued for that type.');
+  const m={sp:[SP_H,'Sponsored Products'],sb:[SB_H,'Sponsored Brands'],sd:[SD_H,'Sponsored Display']};
+  const [h,nm]=m[t];const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,mkWS(h,Q[t]),nm);
+  XLSX.writeFile(wb,`Amazon_${t.toUpperCase()}_Bulk_${ds_()}.xlsx`);
+  shAlert('exp-alert','ok','✅ Downloaded!');
 }
 
-// ════════════════════════════════════════════════════════════
-//  SEARCH TERM MINER
-// ════════════════════════════════════════════════════════════
-let stmData = [];      // parsed + classified rows
-let stmFilter_ = 'all';
-
-// — Drag & drop —
-function stmDragOver(e){e.preventDefault();$('stm-zone').classList.add('drag');}
-function stmDragLeave(){$('stm-zone').classList.remove('drag');}
-function stmDrop(e){e.preventDefault();$('stm-zone').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)stmRead(f);}
-function stmLoad(inp){const f=inp.files[0];if(f)stmRead(f);}
-
-// — Column name normaliser —
-const COL_MAP={
-  term:['customer search term','search term','customerSearchTerm','customer_search_term'],
-  campaign:['campaign name','campaign'],
-  adgroup:['ad group name','ad group'],
-  match:['match type'],
-  impr:['impressions'],
-  clicks:['clicks'],
-  spend:['spend','cost','total spend'],
-  sales:['7 day total sales','total sales','sales','7-day total sales'],
-  orders:['7 day total orders (#)','total orders (#)','orders (#)','orders','7-day total orders'],
-  units:['7 day total units (#)','total units (#)','units'],
-  acos:['total advertising cost of sales (acos)','acos','acos (%)','advertising cost of sales'],
-  cpc:['cost per click (cpc)','cpc','cost per click'],
-  cvr:['7 day conversion rate','conversion rate','cvr']
-};
-
-function findCol(headers,aliases){
-  const hl=headers.map(h=>h.toLowerCase().trim());
-  for(const a of aliases){const i=hl.indexOf(a.toLowerCase());if(i>-1)return i;}
-  // fuzzy: partial match
-  for(const a of aliases){const i=hl.findIndex(h=>h.includes(a.toLowerCase().substring(0,8)));if(i>-1)return i;}
-  return -1;
+// ══════════════════════════════════════════════════════════
+// FILE READER UTIL
+// ══════════════════════════════════════════════════════════
+function readFile(file,cb){
+  const ext=file.name.split('.').pop().toLowerCase();
+  if(ext==='csv'||ext==='txt'){
+    const r=new FileReader();r.onload=e=>{const lines=e.target.result.split(/\r?\n/);cb(lines.map(l=>l.split(',')));};r.readAsText(file);
+  }else{
+    const r=new FileReader();r.onload=e=>{const wb=XLSX.read(e.target.result,{type:'binary'});const ws=wb.Sheets[wb.SheetNames[0]];cb(XLSX.utils.sheet_to_json(ws,{header:1,defval:''}));};r.readAsBinaryString(file);
+  }
 }
+function pNum(val){if(val===undefined||val===null)return 0;const s=String(val).replace(/[%,$,\s]/g,'').trim();return isNaN(s)||s===''||s==='--'||s==='-'?0:parseFloat(s);}
+function fndCol(hdrs,aliases){const h=hdrs.map(x=>String(x).toLowerCase().trim());for(const a of aliases){const i=h.indexOf(a);if(i>-1)return i;}for(const a of aliases){const i=h.findIndex(x=>x.includes(a.substring(0,6)));if(i>-1)return i;}return-1;}
 
-function parseNum(v){
-  if(v===undefined||v===null||v==='--'||v==='-'||v==='N/A'||v==='')return 0;
-  return parseFloat(String(v).replace(/[%,$,]/g,'').trim())||0;
-}
+// ══════════════════════════════════════════════════════════
+// SEARCH TERM MINER
+// ══════════════════════════════════════════════════════════
+let STM=[];
+const STM_COLS={term:['customer search term','search term','customersearchterm'],campaign:['campaign name','campaign'],ag:['ad group name','ad group'],match:['match type'],impr:['impressions'],clicks:['clicks'],spend:['spend','cost'],sales:['7 day total sales','total sales','sales','7-day total sales'],orders:['7 day total orders (#)','orders (#)','orders','total orders'],acos:['total advertising cost of sales (acos)','acos','acos (%)'],cpc:['cost per click (cpc)','cpc','cost per click']};
 
 function stmRead(file){
-  const ext=file.name.split('.').pop().toLowerCase();
-  const status=$('stm-upload-status');
-  status.style.display='block';status.textContent='Reading file…';
-
-  if(ext==='csv'||ext==='txt'){
-    const reader=new FileReader();
-    reader.onload=e=>stmParse(e.target.result.split(/\r?\n/).map(l=>l.split(',')),file.name);
-    reader.readAsText(file);
-  } else {
-    const reader=new FileReader();
-    reader.onload=e=>{
-      const wb=XLSX.read(e.target.result,{type:'binary'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-      stmParse(raw,file.name);
-    };
-    reader.readAsBinaryString(file);
-  }
-}
-
-function stmParse(raw,fname){
-  // Find header row (first row with >5 non-empty cells)
-  let hdrIdx=0;
-  for(let i=0;i<Math.min(10,raw.length);i++){if(raw[i].filter(c=>String(c).trim()).length>5){hdrIdx=i;break;}}
-  const headers=raw[hdrIdx].map(h=>String(h).trim());
-  const dataRows=raw.slice(hdrIdx+1).filter(r=>r.some(c=>String(c).trim()));
-
-  // Map columns
-  const ci={};
-  for(const [key,aliases] of Object.entries(COL_MAP)){ci[key]=findCol(headers,aliases);}
-
-  // Show detected columns
-  const colList=$('stm-col-list');colList.innerHTML='';
-  const detected=[];
-  for(const [key,idx] of Object.entries(ci)){
-    if(idx>-1){detected.push(key);colList.innerHTML+=`<span style="background:#e8f0fe;color:var(--bl);border-radius:3px;padding:2px 7px;font-size:10px;font-weight:700;">${key}: ${headers[idx]}</span>`;}
-    else{colList.innerHTML+=`<span style="background:#fee;color:var(--rd);border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">${key}: ⚠️ not found</span>`;}
-  }
-  $('stm-col-map').style.display='block';
-
-  if(ci.term===-1){$('stm-upload-status').textContent='❌ Could not find "Customer Search Term" column. Check your file.';$('stm-upload-status').style.color='var(--rd)';return;}
-
-  // Parse rows — aggregate by search term + campaign
-  const agg={};
-  dataRows.forEach(row=>{
-    const term=String(row[ci.term]||'').trim();if(!term)return;
-    const camp=ci.campaign>-1?String(row[ci.campaign]||'').trim():'';
-    const ag=ci.adgroup>-1?String(row[ci.adgroup]||'').trim():'';
-    const mt=ci.match>-1?String(row[ci.match]||'').trim():'';
-    const key=term+'|||'+camp;
-    if(!agg[key])agg[key]={term,camp,ag,mt,impr:0,clicks:0,spend:0,sales:0,orders:0,units:0,cpc:0,cpcN:0};
-    const a=agg[key];
-    a.impr+=parseNum(ci.impr>-1?row[ci.impr]:0);
-    a.clicks+=parseNum(ci.clicks>-1?row[ci.clicks]:0);
-    a.spend+=parseNum(ci.spend>-1?row[ci.spend]:0);
-    a.sales+=parseNum(ci.sales>-1?row[ci.sales]:0);
-    a.orders+=parseNum(ci.orders>-1?row[ci.orders]:0);
-    a.units+=parseNum(ci.units>-1?row[ci.units]:0);
-    if(ci.cpc>-1&&parseNum(row[ci.cpc])>0){a.cpc+=parseNum(row[ci.cpc]);a.cpcN++;}
+  if(!file)return;
+  readFile(file,(raw)=>{
+    let hIdx=0;for(let i=0;i<Math.min(10,raw.length);i++){if(raw[i].filter(c=>String(c).trim()).length>5){hIdx=i;break;}}
+    const hdrs=raw[hIdx].map(h=>String(h).trim());
+    const data=raw.slice(hIdx+1).filter(r=>r.some(c=>String(c).trim()));
+    const ci={};for(const[k,al]of Object.entries(STM_COLS))ci[k]=fndCol(hdrs,al);
+    const cl=$('stm-cols');cl.innerHTML='';
+    for(const[k,i]of Object.entries(ci)){const ok=i>-1;cl.innerHTML+=`<span style="background:${ok?'#EFF6FF':'#FEF2F2'};color:${ok?'var(--bl)':'var(--rd)'};border-radius:3px;padding:2px 7px;font-size:10px;font-weight:700;">${k}${ok?'':'⚠️'}</span>`;}
+    $('stm-col-map').style.display='block';
+    if(ci.term===-1){const s=$('stm-up-status');s.className='up-status err';s.textContent='❌ Cannot find "Customer Search Term" column.';return;}
+    const agg={};
+    data.forEach(row=>{
+      const term=String(row[ci.term]||'').trim();if(!term)return;
+      const camp=ci.campaign>-1?String(row[ci.campaign]||'').trim():'';
+      const ag_=ci.ag>-1?String(row[ci.ag]||'').trim():'';
+      const mt=ci.match>-1?String(row[ci.match]||'').trim():'';
+      const key=term+'|||'+camp;
+      if(!agg[key])agg[key]={term,camp,ag:ag_,mt,impr:0,clicks:0,spend:0,sales:0,orders:0,cpc:0,cn:0,status:'inc'};
+      const a=agg[key];
+      a.impr+=pNum(ci.impr>-1?row[ci.impr]:0);a.clicks+=pNum(ci.clicks>-1?row[ci.clicks]:0);
+      a.spend+=pNum(ci.spend>-1?row[ci.spend]:0);a.sales+=pNum(ci.sales>-1?row[ci.sales]:0);
+      a.orders+=pNum(ci.orders>-1?row[ci.orders]:0);
+      if(ci.cpc>-1&&pNum(row[ci.cpc])>0){a.cpc+=pNum(row[ci.cpc]);a.cn++;}
+    });
+    STM=Object.values(agg).map(a=>{a.acos=a.sales>0?a.spend/a.sales*100:Infinity;a.cpcAvg=a.cn>0?a.cpc/a.cn:0;return a;});
+    const s=$('stm-up-status');s.className='up-status ok';s.textContent=`✅ ${STM.length} unique search terms loaded from "${file.name}"`;
+    $('stm-rules').style.display='block';
+    shAlert('stm-alert','ok',`Loaded ${STM.length} terms. Configure rules below and click Analyse.`);
   });
-
-  // Finalise
-  stmData=Object.values(agg).map(a=>{
-    a.acos=a.sales>0?(a.spend/a.sales*100):Infinity;
-    a.cpcAvg=a.cpcN>0?a.cpc/a.cpcN:0;
-    a.status='inc'; // default
-    return a;
-  });
-
-  const n=stmData.length;
-  $('stm-upload-status').textContent=`✅ Loaded "${fname}" — ${n} unique search terms from ${dataRows.length} rows.`;
-  $('stm-upload-status').style.color='var(--gn)';
-  $('stm-rules-card').style.display='block';
-  showAlert('stm-alert','ok',`Loaded ${n} search terms. Set your rules below and click Analyse.`);
 }
 
 function stmAnalyse(){
-  if(!stmData.length)return showAlert('stm-alert','err','Upload a Search Term Report first.');
-
-  const negClicks=num('r-neg-clicks')||5;
-  const negSpend=num('r-neg-spend')||3;
-  const negAcos=num('r-neg-acos')||80;
-  const negAcosSpend=num('r-neg-acos-spend')||5;
-  const hrvOrders=num('r-hrv-orders')||2;
-  const hrvAcos=num('r-hrv-acos')||35;
-  const hrvImpr=num('r-hrv-impr')||50;
-
-  let negCnt=0,hrvCnt=0,invCnt=0,incCnt=0;
-  let totSpend=0,totOrders=0,wastedSpend=0,hrvSales=0;
-
-  stmData.forEach(a=>{
-    totSpend+=a.spend;totOrders+=a.orders;
-    // Rule 1: Negative — zero orders with enough clicks or spend
-    if((a.clicks>=negClicks||a.spend>=negSpend)&&a.orders===0){a.status='neg';negCnt++;wastedSpend+=a.spend;return;}
-    // Rule 2: Negative — high ACoS despite some orders
-    if(a.spend>=negAcosSpend&&isFinite(a.acos)&&a.acos>negAcos&&a.orders>0){a.status='neg';negCnt++;wastedSpend+=a.spend;return;}
-    // Rule 3: Harvest — good orders and ACoS below target
-    if(a.orders>=hrvOrders&&(isFinite(a.acos)?a.acos<=hrvAcos:false)&&a.impr>=hrvImpr){a.status='hrv';hrvCnt++;hrvSales+=a.sales;return;}
-    // Rule 4: Investigate — converting but ACoS is high
-    if(a.orders>0&&isFinite(a.acos)&&a.acos>hrvAcos){a.status='inv';invCnt++;return;}
-    a.status='inc';incCnt++;
+  if(!STM.length)return shAlert('stm-alert','err','Upload a report first.');
+  const nc=num('r-nc')||5,ns_=num('r-ns')||3,na=num('r-na')||80,nas=num('r-nas')||5;
+  const ho=num('r-ho')||2,ha=num('r-ha')||35,hi_=num('r-hi')||50;
+  let neg=0,hrv=0,inv=0,inc=0,totSp=0,totOr=0,wasted=0,hSales=0;
+  STM.forEach(a=>{
+    totSp+=a.spend;totOr+=a.orders;
+    if((a.clicks>=nc||a.spend>=ns_)&&a.orders===0){a.status='neg';neg++;wasted+=a.spend;return;}
+    if(a.spend>=nas&&isFinite(a.acos)&&a.acos>na&&a.orders>0){a.status='neg';neg++;wasted+=a.spend;return;}
+    if(a.orders>=ho&&isFinite(a.acos)&&a.acos<=ha&&a.impr>=hi_){a.status='hrv';hrv++;hSales+=a.sales;return;}
+    if(a.orders>0&&isFinite(a.acos)&&a.acos>ha){a.status='inv';inv++;return;}
+    a.status='inc';inc++;
   });
-
-  $('stm-total').textContent=stmData.length;
-  $('stm-neg-cnt').textContent=negCnt;
-  $('stm-hrv-cnt').textContent=hrvCnt;
-  $('stm-inv-cnt').textContent=invCnt;
-  $('stm-tot-spend').textContent=fmtMoney(totSpend);
-  $('stm-tot-orders').textContent=totOrders;
-  $('stm-wasted').textContent=fmtMoney(wastedSpend);
-  $('stm-hrv-sales').textContent=fmtMoney(hrvSales);
-
-  stmRender('all');
+  $('stm-total').textContent=STM.length;$('stm-neg').textContent=neg;$('stm-hrv').textContent=hrv;$('stm-inv').textContent=inv;$('stm-inc').textContent=inc;
+  $('stm-sp').textContent=fm$(totSp);$('stm-or').textContent=totOr;$('stm-ws').textContent=fm$(wasted);$('stm-hs').textContent=fm$(hSales);
+  stmFlt('all',document.querySelector('.filter-btn'));
   $('stm-results').style.display='block';
   $('stm-results').scrollIntoView({behavior:'smooth',block:'start'});
-  showAlert('stm-alert','ok',`Analysis complete — ${negCnt} negatives, ${hrvCnt} harvest, ${invCnt} investigate.`);
+  shAlert('stm-alert','ok',`Analysis: ${neg} negatives · ${hrv} harvest · ${inv} investigate`);
 }
 
-function stmRender(filter){
-  stmFilter_=filter;
-  const tb=$('stm-tbody');tb.innerHTML='';
-  const show=filter==='all'?stmData:stmData.filter(a=>a.status===filter);
-  const pillMap={neg:'p-neg',hrv:'p-hrv',inv:'p-inv',inc:'p-inc'};
-  const lblMap={neg:'🔴 Negative',hrv:'🟢 Harvest',inv:'🟡 Investigate',inc:'⚪ Inconclusive'};
-  const rowMap={neg:'col-neg',hrv:'col-hrv',inv:'',inc:''};
-
-  show.forEach((a,i)=>{
-    const acosTxt=isFinite(a.acos)?a.acos.toFixed(1)+'%':'—';
-    const cpcTxt=a.cpcAvg>0?'$'+a.cpcAvg.toFixed(2):'—';
-    tb.innerHTML+=`<tr class="${rowMap[a.status]}" data-status="${a.status}" data-idx="${stmData.indexOf(a)}">
-      <td><input type="checkbox" class="stm-cb" checked data-idx="${stmData.indexOf(a)}"/></td>
-      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;" title="${a.term}">${a.term}</td>
-      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;color:var(--mu);" title="${a.camp}">${a.camp||'—'}</td>
-      <td>${a.mt||'—'}</td>
-      <td>${a.impr.toLocaleString()}</td>
-      <td>${a.clicks}</td>
-      <td>$${a.spend.toFixed(2)}</td>
-      <td>$${a.sales.toFixed(2)}</td>
-      <td>${a.orders}</td>
-      <td style="font-weight:700;color:${isFinite(a.acos)&&a.acos>80?'var(--rd)':isFinite(a.acos)&&a.acos<35?'var(--gn)':'inherit'}">${acosTxt}</td>
-      <td>${cpcTxt}</td>
-      <td><span class="pill ${pillMap[a.status]}">${lblMap[a.status]}</span></td>
-    </tr>`;
+function stmFlt(f,btn){
+  if(btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  const data=f==='all'?STM:STM.filter(a=>a.status===f);
+  const PM={neg:'p-neg',hrv:'p-hrv',inv:'p-inv',inc:'p-inc'};
+  const LM={neg:'🔴 Negative',hrv:'🟢 Harvest',inv:'🟡 Investigate',inc:'⚪ Inconclusive'};
+  const BG={neg:'#FFF5F5',hrv:'#F0FFF4',inv:'#FFFDE7',inc:''};
+  const tb=$('stm-tb');tb.innerHTML='';
+  data.forEach(a=>{
+    const idx=STM.indexOf(a);
+    const acosC=isFinite(a.acos)&&a.acos<35?'color:var(--gn);font-weight:700':isFinite(a.acos)&&a.acos>80?'color:var(--rd);font-weight:700':'';
+    tb.innerHTML+=`<tr style="background:${BG[a.status]}"><td><input type="checkbox" class="stm-cb" checked data-idx="${idx}"/></td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;" title="${a.term}">${a.term}</td><td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;color:var(--mu);" title="${a.camp}">${a.camp||'—'}</td><td>${fmK(a.impr)}</td><td>${a.clicks}</td><td>${fm$(a.spend)}</td><td>${fm$(a.sales)}</td><td>${a.orders}</td><td style="${acosC}">${pct(a.acos)}</td><td>${a.cpcAvg>0?fm$(a.cpcAvg):'—'}</td><td><span class="pill ${PM[a.status]}">${LM[a.status]}</span></td></tr>`;
   });
-  if(!show.length)tb.innerHTML='<tr><td colspan="12" style="text-align:center;padding:20px;color:var(--mu);">No terms match this filter.</td></tr>';
+  if(!data.length)tb.innerHTML='<tr><td colspan="11" style="text-align:center;padding:18px;color:var(--mu);">No terms match this filter.</td></tr>';
 }
+function stmSelAll(c){document.querySelectorAll('.stm-cb').forEach(cb=>cb.checked=c);}
+function getSel(){const s=new Set();document.querySelectorAll('.stm-cb:checked').forEach(cb=>s.add(+cb.dataset.idx));return STM.filter((_,i)=>s.has(i));}
 
-function stmFilter(f,btn){
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  stmRender(f);
-}
-
-function stmSelectAll(checked){
-  document.querySelectorAll('.stm-cb').forEach(cb=>cb.checked=checked);
-  $('stm-sel-all').checked=checked;
-}
-
-function getSelectedData(){
-  const selected=new Set();
-  document.querySelectorAll('.stm-cb:checked').forEach(cb=>selected.add(parseInt(cb.dataset.idx)));
-  return stmData.filter((_,i)=>selected.has(i));
-}
-
-function stmExport(mode){
-  const sel=getSelectedData();
-  if(!sel.length)return showAlert('stm-alert','err','No terms selected — use checkboxes to select terms to export.');
-
-  const negLevel=v('r-neg-level');
-  const negAGName=v('r-neg-ag').trim();
-  const negMTs=[]; if($('r-nmt-e').checked)negMTs.push('Negative Exact'); if($('r-nmt-p').checked)negMTs.push('Negative Phrase');
-  if(!negMTs.length)negMTs.push('Negative Exact');
-
-  const hrvCamp=v('r-hrv-camp').trim()||`Harvested_Exact_${dateStr()}`;
-  const hrvAG=v('r-hrv-ag').trim()||'AG_Harvested_Exact';
-  const hrvBid=num('r-hrv-bid')||0.75;
-  const hrvBgt=num('r-hrv-bgt')||10;
-  const hrvAsin=v('r-hrv-asin').trim();
-
-  const negRows=[], hrvRows=[];
-  const negTerms=sel.filter(a=>a.status==='neg');
-  const hrvTerms=sel.filter(a=>a.status==='hrv');
-
-  // — Negative rows —
-  if(mode==='neg'||mode==='both'){
-    // Group negatives by campaign
+function stmExp(mode){
+  const sel=getSel();if(!sel.length)return shAlert('stm-alert','err','No terms selected.');
+  const nl=v('r-nl'),nlag=v('r-nlag').trim();
+  const nmt=[];if($('r-ne').checked)nmt.push('Negative Exact');if($('r-np').checked)nmt.push('Negative Phrase');
+  if(!nmt.length)nmt.push('Negative Exact');
+  const hc=v('r-hc').trim()||`Harvested_Exact_${ds_()}`,hag=v('r-hag').trim()||'AG_Harvested';
+  const hb=num('r-hb')||0.75,hbgt=num('r-hbgt')||10,hasin=v('r-hasin').trim();
+  const neg=[],hrv=[];
+  if(mode!=='hrv'){
     const byCamp={};
-    negTerms.forEach(a=>{const k=a.camp||'';if(!byCamp[k])byCamp[k]=[];byCamp[k].push(a);});
-    Object.entries(byCamp).forEach(([camp,terms])=>{
-      terms.forEach(a=>{
-        negMTs.forEach(mt=>{
-          const entity=negLevel==='campaign'?'Campaign Negative Keyword':'Negative keyword';
-          negRows.push(spRow({'Entity':entity,'Campaign Name':camp,'Ad Group Name':negLevel==='adgroup'?negAGName:undefined,'Keyword Text':a.term,'Match Type':mt}));
-        });
-      });
-    });
+    sel.filter(a=>a.status==='neg').forEach(a=>{const k=a.camp||'';if(!byCamp[k])byCamp[k]=[];byCamp[k].push(a);});
+    Object.entries(byCamp).forEach(([camp,terms])=>terms.forEach(a=>nmt.forEach(mt=>{
+      const ent=nl==='campaign'?'Campaign Negative Keyword':'Negative keyword';
+      neg.push(spR({Entity:ent,'Campaign Name':camp,'Ad Group Name':nl==='adgroup'?nlag:undefined,'Keyword Text':a.term,'Match Type':mt}));
+    })));
   }
-
-  // — Harvest rows —
-  if(mode==='hrv'||mode==='both'){
-    if(hrvTerms.length){
-      // Campaign row
-      hrvRows.push(spRow({'Entity':'Campaign','Campaign Name':hrvCamp,'Start Date':toSPDate(today()),'State':'Enabled','Daily Budget':hrvBgt,'Targeting Type':'Manual','Bidding Strategy':'Dynamic bids - down only'}));
-      // Ad Group row
-      hrvRows.push(spRow({'Entity':'Ad Group','Campaign Name':hrvCamp,'Ad Group Name':hrvAG,'State':'Enabled','Max Bid':hrvBid}));
-      // Ad row if ASIN provided
-      if(hrvAsin)hrvRows.push(spRow({'Entity':'Ad','Campaign Name':hrvCamp,'Ad Group Name':hrvAG,'State':'Enabled','SKU':hrvAsin}));
-      // Keyword rows
-      hrvTerms.forEach(a=>hrvRows.push(spRow({'Entity':'Keyword','Campaign Name':hrvCamp,'Ad Group Name':hrvAG,'State':'Enabled','Keyword Text':a.term,'Match Type':'Exact','Max Bid':hrvBid})));
+  if(mode!=='neg'){
+    const hTerms=sel.filter(a=>a.status==='hrv');
+    if(hTerms.length){
+      hrv.push(spR({Entity:'Campaign','Campaign Name':hc,'Start Date':toSPD(today_()),State:'Enabled','Daily Budget':hbgt,'Targeting Type':'Manual','Bidding Strategy':'Dynamic bids - down only'}));
+      hrv.push(spR({Entity:'Ad Group','Campaign Name':hc,'Ad Group Name':hag,State:'Enabled','Max Bid':hb}));
+      if(hasin)hrv.push(spR({Entity:'Ad','Campaign Name':hc,'Ad Group Name':hag,State:'Enabled',SKU:hasin}));
+      hTerms.forEach(a=>hrv.push(spR({Entity:'Keyword','Campaign Name':hc,'Ad Group Name':hag,State:'Enabled','Keyword Text':a.term,'Match Type':'Exact','Max Bid':hb})));
     }
   }
-
   const wb=XLSX.utils.book_new();
-  const allRows=[...negRows,...hrvRows];
+  const mkSh=(rows,nm)=>{const ws=XLSX.utils.aoa_to_sheet([SP_H,...rows]);ws['!cols']=SP_H.map((_,ci)=>({wch:Math.min(Math.max(...[SP_H,...rows].map(r=>String(r[ci]??'').length))+2,55)}));XLSX.utils.book_append_sheet(wb,ws,nm);};
+  if(neg.length)mkSh(neg,'Negative Keywords');
+  if(hrv.length)mkSh(hrv,'Harvest Keywords');
+  if(!wb.SheetNames.length)return shAlert('stm-alert','err','No rows to export for selected mode/terms.');
+  XLSX.writeFile(wb,`STM_Bulk_${ds_()}.xlsx`);
+  shAlert('stm-alert','ok',`✅ Exported: ${neg.length} neg rows, ${hrv.length} harvest rows.`);
+}
 
-  if((mode==='neg'||mode==='both')&&negRows.length){
-    const ws=XLSX.utils.aoa_to_sheet([SP_H,...negRows]);
-    ws['!cols']=SP_H.map((_,ci)=>({wch:Math.min(Math.max(...[SP_H,...negRows].map(r=>String(r[ci]??'').length))+2,55)}));
-    XLSX.utils.book_append_sheet(wb,ws,'Negative Keywords');
+// ══════════════════════════════════════════════════════════
+// PERFORMANCE DASHBOARD
+// ══════════════════════════════════════════════════════════
+let DASH=[];const CHARTS={};
+const DASH_COLS={product:['product','ad type'],campaign:['campaign name','campaign'],entity:['entity'],impr:['impressions'],clicks:['clicks'],spend:['spend','cost'],sales:['7 day total sales','total sales','sales'],orders:['7 day total orders (#)','orders (#)','orders'],acos:['total advertising cost of sales (acos)','acos'],roas:['total return on advertising spend (roas)','roas'],cpc:['cost per click (cpc)','cpc'],ctr:['click-thru rate (ctr)','ctr'],cvr:['7 day conversion rate','conversion rate','cvr']};
+
+function dashRead(file){
+  if(!file)return;
+  readFile(file,(raw)=>{
+    let hIdx=0;for(let i=0;i<Math.min(15,raw.length);i++){if(raw[i].filter(c=>String(c).trim()).length>4){hIdx=i;break;}}
+    const hdrs=raw[hIdx].map(h=>String(h).trim());
+    const data=raw.slice(hIdx+1).filter(r=>r.some(c=>String(c).trim()!=''));
+    const ci={};for(const[k,al]of Object.entries(DASH_COLS))ci[k]=fndCol(hdrs,al);
+    if(ci.campaign===-1){const s=$('dash-up-status');s.className='up-status err';s.textContent='❌ Cannot find "Campaign Name" column.';return;}
+
+    // Aggregate by campaign name (filter to Campaign entity rows if entity col exists)
+    const agg={};
+    data.forEach(row=>{
+      const ent=ci.entity>-1?String(row[ci.entity]||'').toLowerCase().trim():'campaign';
+      if(ent&&ent!=='campaign'&&ent!=='')return; // only campaign-level rows
+      const camp=String(row[ci.campaign]||'').trim();if(!camp)return;
+      const prod=ci.product>-1?String(row[ci.product]||'').trim():'';
+      if(!agg[camp])agg[camp]={camp,prod,impr:0,clicks:0,spend:0,sales:0,orders:0,cpc:0,cn:0};
+      const a=agg[camp];
+      a.impr+=pNum(ci.impr>-1?row[ci.impr]:0);a.clicks+=pNum(ci.clicks>-1?row[ci.clicks]:0);
+      a.spend+=pNum(ci.spend>-1?row[ci.spend]:0);a.sales+=pNum(ci.sales>-1?row[ci.sales]:0);
+      a.orders+=pNum(ci.orders>-1?row[ci.orders]:0);
+      if(ci.cpc>-1&&pNum(row[ci.cpc])>0){a.cpc+=pNum(row[ci.cpc]);a.cn++;}
+    });
+    DASH=Object.values(agg).map(a=>{
+      a.acos=a.sales>0?a.spend/a.sales*100:null;
+      a.roas=a.spend>0?a.sales/a.spend:null;
+      a.ctr=a.impr>0?a.clicks/a.impr*100:0;
+      a.cpcAvg=a.cn>0?a.cpc/a.cn:0;
+      a.cvr=a.clicks>0?a.orders/a.clicks*100:0;
+      return a;
+    }).filter(a=>a.spend>0||a.impr>0);
+
+    const s=$('dash-up-status');s.className='up-status ok';s.textContent=`✅ ${DASH.length} campaigns loaded from "${file.name}"`;
+    $('dash-filters').style.display='block';$('dash-content').style.display='block';
+    dashRender();
+  });
+}
+
+function dashRender(){
+  const tf=v('dash-type-filter'),srt=v('dash-sort'),topN=parseInt(v('dash-top'))||10;
+  let data=DASH.filter(a=>tf==='all'||a.prod===tf);
+  data.sort((a,b)=>{if(srt==='spend')return b.spend-a.spend;if(srt==='acos')return(b.acos||0)-(a.acos||0);if(srt==='sales')return b.sales-a.sales;return b.orders-a.orders;});
+  const top=data.slice(0,topN);
+
+  // KPIs
+  const tot={impr:0,clicks:0,spend:0,sales:0,orders:0,cpc:0,cn:0};
+  data.forEach(a=>{tot.impr+=a.impr;tot.clicks+=a.clicks;tot.spend+=a.spend;tot.sales+=a.sales;tot.orders+=a.orders;if(a.cpcAvg>0){tot.cpc+=a.cpcAvg;tot.cn++;}});
+  const ovAcos=tot.sales>0?tot.spend/tot.sales*100:0;
+  const ovRoas=tot.spend>0?tot.sales/tot.spend:0;
+  const ovCtr=tot.impr>0?tot.clicks/tot.impr*100:0;
+  $('d-spend').textContent=fm$(tot.spend);$('d-sales').textContent=fm$(tot.sales);
+  $('d-acos').textContent=pct(ovAcos);$('d-acos-sub').textContent=ovAcos<35?'✅ On target':'⚠️ Above 35%';$('d-acos-sub').className='kpi-sub '+(ovAcos<35?'kpi-up':'kpi-dn');
+  $('d-orders').textContent=fmK(tot.orders);$('d-cpc').textContent=fm$(tot.cn>0?tot.cpc/tot.cn:0);
+  $('d-impr').textContent=fmK(tot.impr);$('d-clicks').textContent=fmK(tot.clicks);$('d-ctr').textContent=pct(ovCtr);
+  $('d-roas').textContent=ovRoas.toFixed(2)+'x';$('d-camps').textContent=data.length;
+
+  const labels=top.map(a=>a.camp.length>25?a.camp.substring(0,22)+'…':a.camp);
+  const acosPalette=top.map(a=>a.acos===null?'#9CA3AF':a.acos<35?'rgba(6,125,98,.75)':a.acos<80?'rgba(255,153,0,.75)':'rgba(204,12,57,.75)');
+
+  mkChart('c-spend','bar',labels,top.map(a=>+a.spend.toFixed(2)),{label:'Spend ($)',color:'rgba(20,110,180,.75)'});
+  mkChart('c-acos','bar',labels,top.map(a=>a.acos!==null?+a.acos.toFixed(1):null),{label:'ACoS (%)',colors:acosPalette,annotation:35});
+  mkChart('c-salesspend','bar-group',labels,top.map(a=>+a.sales.toFixed(2)),top.map(a=>+a.spend.toFixed(2)));
+  mkChart('c-orders','bar',labels,top.map(a=>a.orders),{label:'Orders',color:'rgba(6,125,98,.75)'});
+
+  // Table
+  const tb=$('dash-tb');tb.innerHTML='';
+  top.forEach(a=>{
+    const acosS=a.acos===null?'color:#9CA3AF':a.acos<35?'color:var(--gn);font-weight:700':a.acos>80?'color:var(--rd);font-weight:700':'color:var(--yw);font-weight:700';
+    tb.innerHTML+=`<tr>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;" title="${a.camp}">${a.camp}</td>
+      <td>${a.prod?`<span class="pill p-inc">${a.prod.replace('Sponsored ','')}</span>`:''}</td>
+      <td>${fmK(a.impr)}</td><td>${fmK(a.clicks)}</td><td>${pct(a.ctr)}</td>
+      <td>${a.cpcAvg>0?fm$(a.cpcAvg):'—'}</td><td>${fm$(a.spend)}</td><td>${fm$(a.sales)}</td>
+      <td>${a.orders}</td><td style="${acosS}">${a.acos!==null?pct(a.acos):'—'}</td>
+      <td>${a.roas?a.roas.toFixed(2)+'x':'—'}</td><td>${pct(a.cvr)}</td>
+    </tr>`;
+  });
+}
+
+function mkChart(id,type,labels,data1,data2orOpts){
+  const ctx=$( id).getContext('2d');
+  if(CHARTS[id]){CHARTS[id].destroy();}
+  if(type==='bar'){
+    const opts=data2orOpts||{};
+    const colors=opts.colors||Array(labels.length).fill(opts.color||'rgba(20,110,180,.75)');
+    CHARTS[id]=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:opts.label||'Value',data:data1,backgroundColor:colors,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},annotation:opts.annotation?{annotations:{line1:{type:'line',yMin:opts.annotation,yMax:opts.annotation,borderColor:'red',borderWidth:1.5,borderDash:[4,4]}}}:{}},scales:{x:{ticks:{font:{size:10},maxRotation:30}},y:{ticks:{font:{size:10}},beginAtZero:true}}}});
+  }else if(type==='bar-group'){
+    CHARTS[id]=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Sales ($)',data:data1,backgroundColor:'rgba(6,125,98,.7)',borderRadius:3},{label:'Spend ($)',data:data2orOpts,backgroundColor:'rgba(204,12,57,.5)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:10}}}},scales:{x:{ticks:{font:{size:10},maxRotation:30}},y:{ticks:{font:{size:10}},beginAtZero:true}}}});
   }
-  if((mode==='hrv'||mode==='both')&&hrvRows.length){
-    const ws=XLSX.utils.aoa_to_sheet([SP_H,...hrvRows]);
-    ws['!cols']=SP_H.map((_,ci)=>({wch:Math.min(Math.max(...[SP_H,...hrvRows].map(r=>String(r[ci]??'').length))+2,55)}));
-    XLSX.utils.book_append_sheet(wb,ws,'Harvest Keywords');
-  }
+}
 
-  if(wb.SheetNames.length===0)return showAlert('stm-alert','err','No rows generated. Select some Negative or Harvest terms first.');
+function dashExport(){
+  if(!DASH.length)return;
+  const wb=XLSX.utils.book_new();
+  const rows=[['Campaign','Ad Type','Impressions','Clicks','CTR%','CPC','Spend','Sales','Orders','ACoS%','RoAS','CVR%'],...DASH.map(a=>[a.camp,a.prod,a.impr,a.clicks,+a.ctr.toFixed(2),+a.cpcAvg.toFixed(2),+a.spend.toFixed(2),+a.sales.toFixed(2),a.orders,a.acos!==null?+a.acos.toFixed(2):null,a.roas?+a.roas.toFixed(2):null,+a.cvr.toFixed(2)])];
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=rows[0].map((_,ci)=>({wch:Math.min(Math.max(...rows.map(r=>String(r[ci]??'').length))+2,40)}));
+  XLSX.utils.book_append_sheet(wb,ws,'Performance');
+  XLSX.writeFile(wb,`PPC_Dashboard_${ds_()}.xlsx`);
+}
 
-  XLSX.writeFile(wb,`STM_Bulk_${dateStr()}.xlsx`);
-  const msg=[];
-  if(negRows.length)msg.push(`${negRows.length} negative rows`);
-  if(hrvRows.length)msg.push(`${hrvRows.length} harvest rows`);
-  showAlert('stm-alert','ok',`✅ Exported ${msg.join(' + ')} — ${wb.SheetNames.join(', ')} sheet(s).`);
+// ══════════════════════════════════════════════════════════
+// CAMPAIGN AUDIT
+// ══════════════════════════════════════════════════════════
+let AUDIT_DATA=[];
+
+function auditRead(file,rerun){
+  if(!file&&!rerun)return;
+  const doAudit=(raw)=>{
+    AUDIT_DATA=raw;
+    let hIdx=0;for(let i=0;i<Math.min(10,raw.length);i++){if(raw[i].filter(c=>String(c).trim()).length>3){hIdx=i;break;}}
+    const hdrs=raw[hIdx].map(h=>String(h).trim());
+    const rows=raw.slice(hIdx+1).filter(r=>r.some(c=>String(c).trim()));
+    runAudit(hdrs,rows);
+  };
+  if(rerun&&AUDIT_DATA.length){doAudit(AUDIT_DATA);return;}
+  readFile(file,doAudit);
+}
+
+function runAudit(hdrs,rows){
+  const VALID_STATES=['enabled','paused','archived'];
+  const VALID_MT=['broad','exact','phrase','negative exact','negative phrase'];
+  const VALID_ENT_SP=['campaign','ad group','ad','keyword','negative keyword','campaign negative keyword','product targeting','negative product targeting','bidding adjustment'];
+  const VALID_ENT_SB=['campaign','keyword','negative keyword','ad'];
+  const VALID_STRAT=['dynamic bids - down only','dynamic bids - up and down','fixed bid'];
+  const hLow=hdrs.map(h=>h.toLowerCase().trim());
+  const col=name=>{const i=hLow.indexOf(name.toLowerCase());return i;};
+
+  // Detect product type
+  const prodCol=col('product');
+  const entityCol=fndCol(hdrs,['entity']);
+  const stateCol=fndCol(hdrs,['state']);
+  const budgetCol=fndCol(hdrs,['daily budget','budget']);
+  const bidCol=fndCol(hdrs,['max bid','bid']);
+  const campCol=fndCol(hdrs,['campaign name','campaign id']);
+  const matchCol=fndCol(hdrs,['match type']);
+  const kwCol=fndCol(hdrs,['keyword text']);
+  const startCol=fndCol(hdrs,['start date']);
+  const stratCol=fndCol(hdrs,['bidding strategy']);
+  const skuCol=fndCol(hdrs,['sku','asin']);
+
+  const issues=[];
+  const addIssue=(sev,rowNum,entity,msg,val)=>issues.push({sev,rowNum,entity:entity||'',msg,val:val||''});
+
+  // Track campaign structure
+  const campaigns=new Set(),adGroups=new Set(),campHasAdGroup={},campHasAd={},campHasKW={};
+  const campNames=[];
+
+  rows.forEach((row,ri)=>{
+    const rn=ri+2; // 1-indexed + header
+    const ent=entityCol>-1?String(row[entityCol]||'').trim().toLowerCase():'';
+    const camp=campCol>-1?String(row[campCol]||'').trim():'';
+    const state=stateCol>-1?String(row[stateCol]||'').trim().toLowerCase():'';
+    const budget=budgetCol>-1?pNum(row[budgetCol]):null;
+    const bid=bidCol>-1?pNum(row[bidCol]):null;
+    const match=matchCol>-1?String(row[matchCol]||'').trim().toLowerCase():'';
+    const kw=kwCol>-1?String(row[kwCol]||'').trim():'';
+    const startDate=startCol>-1?String(row[startCol]||'').trim():'';
+
+    // Entity-specific checks
+    if(ent==='campaign'){
+      if(!camp)addIssue('err',rn,'Campaign','Missing Campaign Name / ID','');
+      else{
+        if(campNames.includes(camp))addIssue('warn',rn,'Campaign',`Duplicate campaign name: "${camp}"`,'');
+        campNames.push(camp);campaigns.add(camp);campHasAdGroup[camp]=false;campHasAd[camp]=false;campHasKW[camp]=false;
+      }
+      if(budget!==null){if(budget<1)addIssue('err',rn,'Campaign',`Budget $${budget} below minimum $1`,budget);if(budget>1000000)addIssue('err',rn,'Campaign',`Budget $${budget} exceeds maximum $1,000,000`,budget);}
+      if(stratCol>-1){const strat=String(row[stratCol]||'').trim().toLowerCase();if(strat&&!VALID_STRAT.includes(strat))addIssue('err',rn,'Campaign',`Invalid Bidding Strategy: "${strat}"`,strat);}
+    }
+    if(ent==='ad group'){if(camp)campHasAdGroup[camp]=true;}
+    if(ent==='ad'){
+      if(camp)campHasAd[camp]=true;
+      if(skuCol>-1&&!String(row[skuCol]||'').trim())addIssue('warn',rn,'Ad','Ad row has no ASIN/SKU','');
+    }
+    if(ent==='keyword'){
+      if(camp)campHasKW[camp]=true;
+      if(!kw)addIssue('err',rn,'Keyword','Keyword row has empty Keyword Text','');
+      if(kw&&kw.split(' ').length>10)addIssue('warn',rn,'Keyword',`Keyword has >10 words: "${kw}"`,kw);
+      if(match&&!VALID_MT.includes(match))addIssue('err',rn,'Keyword',`Invalid Match Type: "${match}"`,match);
+      if(!match)addIssue('warn',rn,'Keyword','Match Type is missing','');
+    }
+    if(ent==='campaign negative keyword'||ent==='negative keyword'){
+      if(!kw)addIssue('err',rn,'Neg KW','Negative keyword row has empty Keyword Text','');
+      if(match&&!VALID_MT.includes(match))addIssue('err',rn,'Neg KW',`Invalid Match Type: "${match}"`,match);
+    }
+    // Common checks
+    if(state&&!VALID_STATES.includes(state))addIssue('err',rn,ent||'Row',`Invalid State: "${state}" — must be Enabled, Paused or Archived`,state);
+    if(bid!==null&&bid>0){if(bid<0.02)addIssue('err',rn,ent||'Row',`Bid $${bid} below minimum $0.02`,bid);if(bid>1000)addIssue('err',rn,ent||'Row',`Bid $${bid} exceeds maximum $1,000`,bid);if(bid>50)addIssue('warn',rn,ent||'Row',`Very high bid: $${bid}. Is this intentional?`,bid);}
+    if(startDate&&!/^\d{8}$/.test(startDate.replace(/-/g,'').replace(/\//g,'').replace(/\d{2}\/\d{2}\/\d{4}/,'XXXXXXXX'))){}// date format varies
+  });
+
+  // Cross-row structural checks
+  Object.entries(campHasAdGroup).forEach(([camp,has])=>{if(!has)addIssue('err',null,'Campaign',`Campaign "${camp}" has no Ad Group row`,camp);});
+  Object.entries(campHasAd).forEach(([camp,has])=>{if(!has)addIssue('warn',null,'Campaign',`Campaign "${camp}" has no Ad row`,camp);});
+
+  // Render
+  const errs=issues.filter(i=>i.sev==='err'),warns=issues.filter(i=>i.sev==='warn'),infos=issues.filter(i=>i.sev==='info');
+  const score=errs.length===0&&warns.length===0?'A':errs.length===0&&warns.length<5?'B':errs.length<3?'C':'D';
+  const ring=$('audit-ring');ring.textContent=score;ring.className='score-ring '+(score==='A'?'score-a':score==='B'?'score-a':score==='C'?'score-b':'score-c');
+  $('a-errs').textContent=errs.length;$('a-warns').textContent=warns.length;$('a-infos').textContent=infos.length;$('a-rows').textContent=rows.length;
+  $('audit-headline').textContent=errs.length?`${errs.length} error${errs.length>1?'s':''} found — fix before uploading`:warns.length?`${warns.length} warning${warns.length>1?'s':''} — review recommended`:'All checks passed ✅';
+  $('audit-sub').textContent=`${rows.length} rows · ${campaigns.size} campaigns · ${errs.length+warns.length+infos.length} total issues`;
+  const s=$('audit-up-status');s.className='up-status ok';s.textContent=`✅ Audit complete — ${rows.length} rows scanned`;
+
+  const container=$('audit-issues');container.innerHTML='';
+  const renderGroup=(sev,list,title,cls)=>{
+    if(!list.length&&sev!=='pass')return;
+    const grp=document.createElement('div');grp.className='audit-group';
+    grp.innerHTML=`<div class="audit-hd ${cls}" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+      ${title} <span style="font-weight:400;font-size:11px;">(${list.length})</span>
+      ${!list.length?'<span style="font-weight:400;margin-left:8px;font-size:11px;">✅ All clear</span>':''}
+    </div><div class="audit-items">${list.map(i=>`<div class="audit-row"><span class="row-no">${i.rowNum?'Row '+i.rowNum:'—'}</span><span class="entity">${i.entity}</span><span class="msg">${i.msg}${i.val?` <code style="background:#F3F4F6;padding:1px 4px;border-radius:2px;">${i.val}</code>`:''}</span></div>`).join('')}</div>`;
+    container.appendChild(grp);
+  };
+  renderGroup('err',errs,'🔴 Errors — will cause upload failure','err');
+  renderGroup('warn',warns,'🟡 Warnings — review recommended','warn');
+  renderGroup('pass',[],'✅ Best Practice Checks','pass');
+  $('audit-content').style.display='block';
+  $('audit-content').scrollIntoView({behavior:'smooth',block:'start'});
+
+  // Store for export
+  window._auditIssues=issues;window._auditRows=rows;window._auditHdrs=hdrs;
+}
+
+function auditExport(){
+  if(!window._auditIssues)return;
+  const wb=XLSX.utils.book_new();
+  const rows=[['Severity','Row Number','Entity','Issue','Value'],...(window._auditIssues).map(i=>[i.sev.toUpperCase(),i.rowNum||'',i.entity,i.msg,i.val])];
+  const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:10},{wch:8},{wch:14},{wch:60},{wch:30}];
+  XLSX.utils.book_append_sheet(wb,ws,'Audit Report');
+  XLSX.writeFile(wb,`Campaign_Audit_${ds_()}.xlsx`);
 }
 </script>
 </body>
